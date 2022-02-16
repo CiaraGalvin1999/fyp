@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { View, TextInput, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+
+const s = require('../stylesheets/loginRegistrationStylesheets');
 
 
 class Registration extends Component {
@@ -32,17 +34,15 @@ class Registration extends Component {
     updateLastName = (value) => {
         this.setState({ lastName: value })
     }
+    //Function that is called when button is clicked, sends POST request to server to register user
+    //TODO: Must add in checks here
     registerUser = () => {
-        console.log("User is being registered");
-        console.log(this.state.username);
-        console.log(this.state.email);
-        console.log(this.state.password);
         fetch('http://10.0.2.2:8000/api/auth/register/', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
-              },
+            },
             body: JSON.stringify({
                 'username': this.state.username,
                 'email': this.state.email,
@@ -59,53 +59,86 @@ class Registration extends Component {
     render() {
 
         return (
-            <View>
-                <View>
+            <View style={s.container}>
+
+                <View style={s.spaceTop} />
+
+                <View style={s.logoContainer}>
+                    <Image style={s.logo} source={require('../assets/logo_colour_transparent.png')} />
+                </View>
+
+                <View style={s.fieldContainer}>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Username</Text></View>
                     <TextInput
-                        placeholder="Username"
+                        style={s.field}
+                        placeholder="Choose a username..."
+                        placeholderTextColor='#53869d'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateUsername}
                     ></TextInput>
                 </View>
-                <View>
+
+                <View style={s.fieldContainer}>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Email Address</Text></View>
                     <TextInput
-                        placeholder="Email Address"
+                        style={s.field}
+                        placeholder="Enter your email..."
+                        placeholderTextColor='#53869d'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateEmail}
                     ></TextInput>
                 </View>
-                <View>
+
+                <View style={s.fieldContainer}>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Password</Text></View>
                     <TextInput
+                        style={s.field}
                         secureTextEntry
                         autoCapitalize="none"
                         autoCorrect={false}
-                        placeholder="Password"
+                        placeholder="Enter a password..."
+                        placeholderTextColor='#53869d'
                         onChangeText={this.updatePassword}
                     ></TextInput>
                 </View>
-                <View>
+
+                <View style={s.fieldContainer}>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>First Name</Text></View>
                     <TextInput
+                        style={s.field}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        placeholder="First Name"
+                        placeholder="Enter your first name..."
+                        placeholderTextColor='#53869d'
                         onChangeText={this.updateFirstName}
                     ></TextInput>
                 </View>
-                <View>
+
+                <View style={s.fieldContainer}>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Surname</Text></View>
                     <TextInput
+                        style={s.field}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        placeholder="Last Name"
+                        placeholder="Enter your surname..."
+                        placeholderTextColor='#53869d'
                         onChangeText={this.updateLastName}
                     ></TextInput>
+
+                    <View style={s.buttonContainer}>
+                        <TouchableOpacity style={s.buttonStyle} onPress={this.registerUser}>
+                            <Text style={s.buttonText}>Register</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
-                <Button title='Register' onPress={this.registerUser} />
+
+
             </View>
         )
     }
-
 }
 
 export default Registration
