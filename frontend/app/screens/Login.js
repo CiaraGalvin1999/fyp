@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 
 
 
-const s = require('../stylesheets/loginRegistrationStylesheets');
+const styles = require('../stylesheets/loginRegistrationStylesheets');
 
 class Login extends Component {
     //Constructor

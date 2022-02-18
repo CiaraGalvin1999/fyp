@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 
-class Dashboard extends Component {
+class Catalogue extends Component {
     //Constructor
     //States are set here
     constructor() {
@@ -11,10 +11,10 @@ class Dashboard extends Component {
     render() {
         return (
             <View>
-                <Text> Dashboard! </Text>
+                <Text> Add Fics! </Text>
             </View>
         )
     }
 }
 
-export default Dashboard
+export default Catalogue

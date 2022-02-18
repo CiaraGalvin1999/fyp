@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native';
 
-const s = require('../stylesheets/loginRegistrationStylesheets');
+const styles = require('../stylesheets/loginRegistrationStylesheets');
 
 
 class Registration extends Component {
@@ -59,84 +59,84 @@ class Registration extends Component {
     render() {
 
         return (
-            <View style={s.container}>
 
-                <View style={s.spaceTop} />
-
-                <View style={s.logoContainer}>
-                    <Image style={s.logo} source={require('../assets/logo_colour_transparent.png')} />
-                </View>
-
-                <View style={s.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Username</Text></View>
-                    <TextInput
-                        style={s.field}
-                        placeholder="Choose a username..."
-                        placeholderTextColor='#53869d'
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        onChangeText={this.updateUsername}
-                    ></TextInput>
-                </View>
-
-                <View style={s.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Email Address</Text></View>
-                    <TextInput
-                        style={s.field}
-                        placeholder="Enter your email..."
-                        placeholderTextColor='#53869d'
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        onChangeText={this.updateEmail}
-                    ></TextInput>
-                </View>
-
-                <View style={s.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Password</Text></View>
-                    <TextInput
-                        style={s.field}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        placeholder="Enter a password..."
-                        placeholderTextColor='#53869d'
-                        onChangeText={this.updatePassword}
-                    ></TextInput>
-                </View>
-
-                <View style={s.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>First Name</Text></View>
-                    <TextInput
-                        style={s.field}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        placeholder="Enter your first name..."
-                        placeholderTextColor='#53869d'
-                        onChangeText={this.updateFirstName}
-                    ></TextInput>
-                </View>
-
-                <View style={s.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Surname</Text></View>
-                    <TextInput
-                        style={s.field}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        placeholder="Enter your surname..."
-                        placeholderTextColor='#53869d'
-                        onChangeText={this.updateLastName}
-                    ></TextInput>
-
-                    <View style={s.buttonContainer}>
-                        <TouchableOpacity style={s.buttonStyle} onPress={this.registerUser}>
-                            <Text style={s.buttonText}>Register</Text>
-                        </TouchableOpacity>
+            <SafeAreaView style={styles.container}>
+                <ScrollView style={{flex: 1}}>
+                    <View style={styles.spaceTop} />
+                    <View style={styles.logoContainer}>
+                        <Image style={styles.logo} source={require('../assets/logo_colour_transparent.png')} />
                     </View>
 
-                </View>
+                    <View style={styles.fieldContainer}>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Username <Text style={styles.required}>*</Text></Text></View>
+                        <TextInput
+                            style={styles.field}
+                            placeholder="Choose a username..."
+                            placeholderTextColor='#53869d'
+                            autoCorrect={false}
+                            autoCapitalize="none"
+                            onChangeText={this.updateUsername}
+                        ></TextInput>
+                    </View>
 
+                    <View style={styles.fieldContainer}>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Email Address</Text></View>
+                        <TextInput
+                            style={styles.field}
+                            placeholder="Enter your email..."
+                            placeholderTextColor='#53869d'
+                            autoCorrect={false}
+                            autoCapitalize="none"
+                            onChangeText={this.updateEmail}
+                        ></TextInput>
+                    </View>
 
-            </View>
+                    <View style={styles.fieldContainer}>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Password <Text style={styles.required}>*</Text></Text></View>
+                        <TextInput
+                            style={styles.field}
+                            secureTextEntry
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Enter a password..."
+                            placeholderTextColor='#53869d'
+                            onChangeText={this.updatePassword}
+                        ></TextInput>
+                    </View>
+
+                    <View style={styles.fieldContainer}>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>First Name</Text></View>
+                        <TextInput
+                            style={styles.field}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Enter your first name..."
+                            placeholderTextColor='#53869d'
+                            onChangeText={this.updateFirstName}
+                        ></TextInput>
+                    </View>
+
+                    <View style={styles.fieldContainer}>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Surname</Text></View>
+                        <TextInput
+                            style={styles.field}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Enter your surname..."
+                            placeholderTextColor='#53869d'
+                            onChangeText={this.updateLastName}
+                        ></TextInput>
+
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.buttonStyle} onPress={this.registerUser}>
+                                <Text style={styles.buttonText}>Register</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{height:100}}></View>
+                </ScrollView>
+            </SafeAreaView>
+
         )
     }
 }

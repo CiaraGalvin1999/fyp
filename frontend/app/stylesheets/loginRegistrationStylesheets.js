@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 module.exports = StyleSheet.create({
     container: {
         backgroundColor: '#202226',
-        height: '100%',
+        flex: 1,
     },
     spaceTop: {
         height: '8%',
@@ -44,5 +44,8 @@ module.exports = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    required: {
+        color: '#f05429',
     }
 });
