@@ -1,4 +1,4 @@
 # Django dependencies
 backend/Lib/site-packages
 backend/Scripts
-backend/backend/db.sqlite3
+backend/backend/*.sqlite3
