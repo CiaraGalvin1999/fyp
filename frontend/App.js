@@ -1,54 +1,60 @@
-import React from 'react';
-import { View } from 'react-native';
-import Login from './app/screens/Login';
-import Registration from './app/screens/Registration';
-import Dashboard from './app/screens/Dashboard';
-import Profile from './app/screens/Profile';
-import Catalogue from './app/screens/Catalogue'
-import AddFic from './app/screens/AddFic'
+// Imports
+import React, { Component } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import UnauthStackScreen from './app/screens/UnauthScreensStack';
+import AuthStackScreen from './app/screens/AuthScreensStack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Tab = createBottomTabNavigator();
+// Parent navigator
+import { createStackNavigator } from '@react-navigation/stack';
+const parentStack = createStackNavigator();
 
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName={Dashboard}
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+// Ignore warning
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs([
+  "[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!",
+]);
 
-            if (route.name === 'Dashboard') {
-              iconName = focused ? 'planet-outline' : 'planet';
-            } else if (route.name === 'Catalogue') {
-              iconName = focused ? 'library-outline' : 'library';
-            } else if (route.name === 'Profile') {
-              iconName = focused ? 'person-outline' : 'person';
-            } else if (route.name === 'AddFic') {
-              iconName = focused ? 'add-outline' : 'add';
-              //Made add button larger because it looked very small compared to other icons
-              return <Ionicons name={iconName} size={36} color={color} />;
-            }
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      isLoading: true,
+      token: false,
+    }
+  }
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#53869d',
-          tabBarInactiveTintColor: 'white',
-          tabBarActiveBackgroundColor: "#202226",
-          tabBarInactiveBackgroundColor: '#202226',
-  
-        })}
-      >
-        <Tab.Screen name="Dashboard" component={Dashboard}  options={{tabBarShowLabel: false}} />
-        <Tab.Screen name="AddFic" component={AddFic} options={{tabBarShowLabel: false}} />
-        <Tab.Screen name="Catalogue" component={Catalogue}  options={{tabBarShowLabel: false}} />
-        <Tab.Screen name="Profile" component={Profile} options={{tabBarShowLabel: false}} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  )
+  componentDidMount() {
+    AsyncStorage.clear();
+    AsyncStorage.getItem('token').then((t) => {
+      this.setState({ token: t !== null, isLoading:false })
+    })
+  }
+
+  render() {
+    const auth = false;
+    // Loading screen while checking if user is logged in already or not
+    if (this.state.isLoading) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
+    return (
+      <NavigationContainer>
+        <parentStack.Navigator 
+          initialRouteName={this.state.token ? 'authNav' : 'unauthNav'} 
+          screenOptions={({ route, navigation }) => ({
+            headerShown: false,
+          })}
+        >
+          <parentStack.Screen name='unauthNav' component={UnauthStackScreen}></parentStack.Screen>
+          <parentStack.Screen name='authNav' component={AuthStackScreen}></parentStack.Screen>
+        </parentStack.Navigator>
+      </NavigationContainer>
+    )
+  }
 }
 export default App;

@@ -1,11 +1,13 @@
+// Imports
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import authTokenFunctions from '../components/authTokenFunctions';
 
-
-
-const styles = require('../stylesheets/loginRegistrationStylesheets');
+// Stylesheet
+const styles = require('../stylesheets/mainStylesheet');
 
 class Login extends Component {
+
     //Constructor
     //States are set here
     constructor() {
@@ -37,12 +39,18 @@ class Login extends Component {
                 'username': this.state.username,
                 'password': this.state.password,
             })
-        }).catch(function (error) {
-            console.log("Error: " + error);
-        });
+        })
+            .then(response => response.json())
+            .then(data => authTokenFunctions.storeToken(data))
+            .then(this.props.navigation.navigate('authNav', {screen: 'Dashboard'}))
+            .catch(function (error) {
+                console.log("Error: " + error);
+            });
     }
 
+
     render() {
+
         return (
             <View style={styles.container}>
 
@@ -77,8 +85,11 @@ class Login extends Component {
                     ></TextInput>
 
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.buttonStyle} onPress={this.registerUser}>
+                        <TouchableOpacity style={styles.buttonStyle} onPress={this.loginUser}>
                             <Text style={styles.buttonText}>Login</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('RegistrationScreen')}>
+                            <Text style={styles.redirectText}>Don't have an account? <Text style={styles.linkText}>Register here</Text></Text>
                         </TouchableOpacity>
                     </View>
 

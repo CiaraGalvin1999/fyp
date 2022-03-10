@@ -27,13 +27,14 @@ module.exports = StyleSheet.create({
         color: 'white',
     },
     buttonStyle: {
-        width: '60%',
+        minWidth: '60%',
         height: 45,
         backgroundColor: '#53869d',
         borderWidth: 1,
         borderColor: '#53869d',
         alignItems: 'center',
         justifyContent: 'center',
+        marginBottom: 15,
     },
     buttonContainer: {
         width: '80%',
@@ -47,5 +48,12 @@ module.exports = StyleSheet.create({
     },
     required: {
         color: '#f05429',
+    },
+    redirectText: {
+        margin: 5,
+        color: 'white',
+    },
+    linkText: {
+        color: '#53869d',
     }
 });

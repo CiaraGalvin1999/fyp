@@ -1,8 +1,5 @@
-#Serializes the User model (default django.contrib.auth user model that django provides)
-
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
 
 class CreateUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
@@ -11,10 +8,11 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'password', 'first_name', 'last_name')
+        fields = ('username', 'password', 'email', 'first_name', 'last_name')
         write_only_fields = ('password')
         read_only_fields = ('is_staff', 'is_superuser', 'is_active',)
 
+    # Can do checks here
     def create(self, validated_data):
         user = super(CreateUserSerializer, self).create(validated_data)
         user.set_password(validated_data['password'])

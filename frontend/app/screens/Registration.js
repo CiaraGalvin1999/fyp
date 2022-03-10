@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native';
 
-const styles = require('../stylesheets/loginRegistrationStylesheets');
+const styles = require('../stylesheets/mainStylesheet');
 
 
 class Registration extends Component {
@@ -131,6 +131,9 @@ class Registration extends Component {
                             <TouchableOpacity style={styles.buttonStyle} onPress={this.registerUser}>
                                 <Text style={styles.buttonText}>Register</Text>
                             </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('LoginScreen')}>
+                            <Text style={styles.redirectText}>Already a user? <Text style={styles.linkText}>Login here</Text></Text>
+                        </TouchableOpacity>
                         </View>
                     </View>
                     <View style={{height:100}}></View>
