@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from api.serializers import CreateUserSerializer
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from django.contrib.auth.models import User
 
 import AO3
 import json
@@ -91,3 +92,9 @@ def searchFic(request):
     data = json.dumps(data)
 
     return Response(data)
+
+
+@api_view(('POST',))
+def addFic(request):
+    username = request.POST.get('username')
+    user = User.objects.get(username=username)
