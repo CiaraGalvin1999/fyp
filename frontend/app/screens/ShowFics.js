@@ -2,11 +2,10 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { panGestureHandlerCustomNativeProps } from 'react-native-gesture-handler/lib/typescript/handlers/PanGestureHandler';
 
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet');
-const pageStyle = require('../stylesheets/showFicsSS')
+const pageStyle = require('../stylesheets/showFicsStyle')
 
 const Result = ({ title, authors, summary }) => (
     <TouchableOpacity style={pageStyle.resultContainer}>
@@ -17,8 +16,14 @@ const Result = ({ title, authors, summary }) => (
             <Text style={pageStyle.authorText} key={index}>{author}</Text>
         ))}
         {/* Summary of fic */}
-        {summary == '' && <Text style={pageStyle.summaryTextEmpty}>{'\n'}No summary available ... </Text>}
-        {summary != '' && <Text style={pageStyle.summaryText}>{summary} </Text>}
+        {/* If empty - no summary available */}
+        {summary == '' && <Text style={pageStyle.summaryTextEmpty}>{'\n'}No summary available ...</Text>}
+
+        {/* If not empty and less than 200 characters - add whole summary */}
+        {summary.length < 200 && summary != '' && <Text style={pageStyle.summaryText}>{summary}</Text>}
+
+        {/* If longer than 200 characters, chop */}
+        {summary.length > 200 && <Text style={pageStyle.summaryText}>{summary.substring(0,200)} ...</Text>}
     </TouchableOpacity>
 );
 

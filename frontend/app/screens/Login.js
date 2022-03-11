@@ -42,6 +42,7 @@ class Login extends Component {
         })
             .then(response => response.json())
             .then(data => authTokenFunctions.storeToken(data))
+            .then(AsyncStorage.setItem('username', this.state.username))
             .then(this.props.navigation.navigate('authNav', {screen: 'Dashboard'}))
             .catch(function (error) {
                 console.log("Error: " + error);
