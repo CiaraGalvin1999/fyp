@@ -12,5 +12,12 @@ urlpatterns = [
     path('auth/logout/', LogoutUserAPIView.as_view(), name='auth_user_logout'),
     # Search fic path - returns list of fics based on title and author sent in request
     path('searchFic/', views.searchFic, name='search_fic'),
+    # Add fic to a specified catalogue
     path('addFic/', views.addFic, name='add_fic'),
+    # Get list of catalogues for specific user
+    path('getCatalogues/', views.getCatalogues, name='get_catalogues'),
+    # Get specific catalogue and return all info including fics
+    path('getCatalogue/', views.getCatalogue, name='get_catalogue'),
+    # Create a new catalogue
+    path('createCatalogue/', views.createCatalogue, name='create_catalogue')
 ]

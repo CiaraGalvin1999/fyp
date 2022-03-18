@@ -16,6 +16,9 @@ LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!",
 ]);
 
+// Stylesheets
+const styles = require('./app/stylesheets/mainStylesheet');
+
 class App extends Component {
   constructor() {
     super();
@@ -26,7 +29,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-    AsyncStorage.clear();
     AsyncStorage.getItem('token').then((t) => {
       this.setState({ token: t !== null, isLoading:false })
     })
@@ -37,7 +39,7 @@ class App extends Component {
     // Loading screen while checking if user is logged in already or not
     if (this.state.isLoading) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={styles.loadingView}>
           <ActivityIndicator size='large' />
         </View>
       )

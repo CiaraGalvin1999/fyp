@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import helpers from '../components/helpers';
 
 const styles = require('../stylesheets/mainStylesheet');
 
@@ -24,20 +24,9 @@ class AddFic extends Component {
         this.setState({ author: value })
     }
 
-    async getToken() {
-        try {
-            let item = await AsyncStorage.getItem('token');
-            let json_token = JSON.parse(item);
-            return json_token.token;
-
-        } catch (error) {
-            console.log("Something went wrong", error);
-        }
-    }
-
     //TODO: FINISH
     searchFics = async () => {
-        let token = await this.getToken();
+        let token = await helpers.getToken();
 
         fetch('http://10.0.2.2:8000/api/searchFic/?title=' + this.state.title + '&author=' + this.state.author, {
             method: 'GET',
@@ -62,11 +51,11 @@ class AddFic extends Component {
                 <View style={styles.spaceTop} />
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Title</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Title</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter title..."
-                        placeholderTextColor='#53869d'
+                        placeholderTextColor='#57a5c9'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateTitle}
@@ -74,13 +63,13 @@ class AddFic extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Author</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Author</Text></View>
                     <TextInput
                         style={styles.field}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Enter author..."
-                        placeholderTextColor='#53869d'
+                        placeholderTextColor='#57a5c9'
                         onChangeText={this.updateAuthor}
                     ></TextInput>
 

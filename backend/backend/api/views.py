@@ -9,6 +9,7 @@ from api.serializers import CreateUserSerializer
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from django.contrib.auth.models import User
+from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 
 import AO3
 import json
@@ -96,5 +97,155 @@ def searchFic(request):
 
 @api_view(('POST',))
 def addFic(request):
-    username = request.POST.get('username')
-    user = User.objects.get(username=username)
+    # Get workid of fanfic
+    body = json.loads(request.body)
+    workid = body['workid']
+    title = body['title']
+    summary = body['summary']
+    authors = body['authors']
+    catalogueID = body['catalogueID']
+
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get catalogue
+    catalogue = Catalogue.objects.get(id=catalogueID)
+
+    # Check if fic is already saved in database
+    fic = Fic.objects.filter(workid=workid)
+
+    # If fic is not in db, add to db
+    # Must also add authors if not already in db
+    if fic.exists() == False:
+        fic = Fic(workid=workid, title=title, summary=summary)
+        fic.save()
+        for authorUsername in authors: 
+            author = Author.objects.filter(username=authorUsername)
+            
+            if author.exists() == False:
+                author = Author(username=authorUsername)
+                author.save()
+
+            else:
+                author = author[0]
+
+            ficAuthor = FicAuthor(fic=fic, author=author)
+            ficAuthor.save()
+
+    else:
+        fic = fic[0]
+
+    # Add fanfic to selected catalogue
+    catalogueFic = CatalogueFic(catalogue=catalogue, fic=fic)
+    catalogueFic.save()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+
+
+
+# TO DO
+# Put in a check to ensure that the work/fic still exists - if it doesnt, delete this from the database
+# (Make seperate function to do this)
+@api_view(('GET',))
+def getCatalogues(request):
+    data = getCataloguesHelper(request)
+
+    return Response(data)
+
+def getCataloguesHelper(request):
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get all catalogues associated with user and return
+    catalogues = Catalogue.objects.filter(user=user)
+    
+    # Create json array of catalogues (inc. title and id) and return in response 
+    data = []
+
+    for catalogue in catalogues:
+        title = catalogue.title
+        catalogueID = catalogue.id
+
+        result = {'title': title, 'id': catalogueID}
+        data.append(result)
+
+    data = json.dumps(data)
+    return data
+
+@api_view(('GET',))
+def getCatalogue(request):
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get ID sent in request
+    catalogueID = int(request.GET.get('id'))
+
+    # Get catalogue associated with ID
+    catalogue = Catalogue.objects.get(id=catalogueID)
+
+    # Get all fics in the catalogue
+    cf = CatalogueFic.objects.filter(catalogue=catalogue)
+
+    # Empty array to add fics to
+    fics = []
+
+    # Check to make sure there are fics in the catalogue
+    if cf.exists():
+        # For every fic in catalogue, add title, workid, authors, and summary to object
+        # Then add fic object to fics array created above
+        for x in cf:
+            fic = x.fic
+            
+            # Title
+            title = fic.title
+
+            # ID
+            workid = fic.workid
+
+            # Add authors - can have multiple authors
+            # authors is a list
+            authors = []
+            af = FicAuthor.objects.filter(fic=fic)
+            for a in af:
+                author = a.author
+                authors.append(author.username)
+
+            # Summary - can be empty
+            if fic.summary == None:
+                summary = ''
+            else:
+                summary = fic.summary
+            
+            # Create JSON object
+            resultJSON = {'title': title, 'authors': authors, 'id': workid, 'summary': summary}
+            fics.append(resultJSON)
+
+    fics = json.dumps(fics)
+    return Response(fics)
+
+@api_view(('POST',))
+def createCatalogue(request):
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get title
+    body = json.loads(request.body)
+    title = body['title']
+
+    # Create catalogue
+    catalogue = Catalogue(title=title, user=user)
+    catalogue.save()
+
+    data = getCataloguesHelper(request)
+
+    return Response(data)

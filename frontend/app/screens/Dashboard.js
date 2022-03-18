@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text } from 'react-native';
 
+const styles = require('../stylesheets/mainStylesheet');
 
 class Dashboard extends Component {
     //Constructor
@@ -11,8 +12,8 @@ class Dashboard extends Component {
 
     render() {
         return (
-            <View>
-                <Text> Dashboard! </Text>
+            <View style={styles.container}>
+                <Text style={{color:'#F3F8F2'}}> Dashboard! </Text>
             </View>
         )
     }

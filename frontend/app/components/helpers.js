@@ -1,11 +1,10 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const authTokenFunctions = {
+const helpers = {
     async storeToken(token) {
         try {
             await AsyncStorage.setItem('token', JSON.stringify(token));
-            console.log(token)
         } catch (error) {
             console.log("Something went wrong", error);
         }
@@ -13,13 +12,13 @@ const authTokenFunctions = {
 
     async getToken() {
         try {
-            token = await AsyncStorage.getItem('token');
-            data = JSON.parse(token);
-            return data;
-            
+            let item = await AsyncStorage.getItem('token');
+            let json_token = JSON.parse(item);
+            return json_token.token;
+
         } catch (error) {
             console.log("Something went wrong", error);
         }
-    },
+    }
 }    
-export default authTokenFunctions;
+export default helpers;

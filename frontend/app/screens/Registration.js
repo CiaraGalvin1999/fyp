@@ -72,7 +72,7 @@ class Registration extends Component {
                         <TextInput
                             style={styles.field}
                             placeholder="Choose a username..."
-                            placeholderTextColor='#53869d'
+                            placeholderTextColor='#57a5c9'
                             autoCorrect={false}
                             autoCapitalize="none"
                             onChangeText={this.updateUsername}
@@ -84,7 +84,7 @@ class Registration extends Component {
                         <TextInput
                             style={styles.field}
                             placeholder="Enter your email..."
-                            placeholderTextColor='#53869d'
+                            placeholderTextColor='#57a5c9'
                             autoCorrect={false}
                             autoCapitalize="none"
                             onChangeText={this.updateEmail}
@@ -99,7 +99,7 @@ class Registration extends Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter a password..."
-                            placeholderTextColor='#53869d'
+                            placeholderTextColor='#57a5c9'
                             onChangeText={this.updatePassword}
                         ></TextInput>
                     </View>
@@ -111,7 +111,7 @@ class Registration extends Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter your first name..."
-                            placeholderTextColor='#53869d'
+                            placeholderTextColor='#57a5c9'
                             onChangeText={this.updateFirstName}
                         ></TextInput>
                     </View>
@@ -123,7 +123,7 @@ class Registration extends Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter your surname..."
-                            placeholderTextColor='#53869d'
+                            placeholderTextColor='#57a5c9'
                             onChangeText={this.updateLastName}
                         ></TextInput>
 

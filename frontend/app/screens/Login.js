@@ -1,7 +1,7 @@
 // Imports
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
-import authTokenFunctions from '../components/authTokenFunctions';
+import helpers from '../components/helpers';
 
 // Stylesheet
 const styles = require('../stylesheets/mainStylesheet');
@@ -41,8 +41,7 @@ class Login extends Component {
             })
         })
             .then(response => response.json())
-            .then(data => authTokenFunctions.storeToken(data))
-            .then(AsyncStorage.setItem('username', this.state.username))
+            .then(data => helpers.storeToken(data))
             .then(this.props.navigation.navigate('authNav', {screen: 'Dashboard'}))
             .catch(function (error) {
                 console.log("Error: " + error);
@@ -62,11 +61,11 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Username</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Username</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter username..."
-                        placeholderTextColor='#53869d'
+                        placeholderTextColor='#57a5c9'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateUsername}
@@ -74,14 +73,14 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Password</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Password</Text></View>
                     <TextInput
                         style={styles.field}
                         secureTextEntry
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Enter password..."
-                        placeholderTextColor='#53869d'
+                        placeholderTextColor='#57a5c9'
                         onChangeText={this.updatePassword}
                     ></TextInput>
 

@@ -3,8 +3,14 @@ import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
     container: {
-        backgroundColor: '#202226',
+        backgroundColor: '#121212',
         flex: 1,
+    },
+    loadingView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#202226'
     },
     spaceTop: {
         height: '8%',
@@ -22,16 +28,14 @@ module.exports = StyleSheet.create({
     },
     field: {
         width: '80%',
-        borderColor: '#53869d',
+        borderColor: '#57a5c9',
         borderBottomWidth: 1,
-        color: 'white',
+        color: '#F3F8F2',
     },
     buttonStyle: {
         minWidth: '60%',
         height: 45,
-        backgroundColor: '#53869d',
-        borderWidth: 1,
-        borderColor: '#53869d',
+        backgroundColor: '#28617B',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 15,
@@ -39,21 +43,87 @@ module.exports = StyleSheet.create({
     buttonContainer: {
         width: '80%',
         marginTop: 15,
-        alignItems:'center',
+        alignItems: 'center',
     },
     buttonText: {
-        color: 'white',
+        color: '#F3F8F2',
         fontSize: 16,
         fontWeight: 'bold',
     },
+    textInputTitle: {
+        color: '#F3F8F2',
+        paddingLeft: 4,
+        paddingTop: 4,
+    },
     required: {
-        color: '#f05429',
+        color: '#52FFB8',
     },
     redirectText: {
         margin: 5,
-        color: 'white',
+        color: '#F3F8F2',
     },
     linkText: {
-        color: '#53869d',
-    }
+        color: '#57a5c9',
+    },
+    modalContent: {
+        flex: 1,
+        justifyContent: 'center',
+        margin: '5%',
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.9)'
+    },
+    modalMain: {
+        backgroundColor: '#202226',
+    },
+    modalHeader: {
+        backgroundColor: '#202226',
+        paddingTop: 10,
+        paddingBottom: 10,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: '#F3F8F2'
+
+    },
+    modalHeaderText: {
+        color: '#F3F8F2',
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    modalMainContent: {
+        maxHeight: 250,
+    },
+    modalFooter: {
+        flexDirection: 'row',
+    },
+    modalHalfButton: {
+        width: '50%',
+        height: 40,
+        backgroundColor: '#28617B',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalFullButton: {
+        width: '100%',
+        height: 40,
+        backgroundColor: '#28617B',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalCloseButton: {
+        width: '50%',
+        height: 40,
+        backgroundColor: '#181818',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    requiredErrorMessage: {
+        paddingTop: 8,
+        paddingLeft: 4,
+        color: '#52FFB8',
+    },
 });
