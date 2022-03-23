@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
-import helpers from '../components/helpers';
-import { ScrollView } from 'react-native-gesture-handler';
-import { TOUCHABLE_STATE } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable';
+import React, { Component } from 'react'
+import { Pressable, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native'
+import helpers from '../components/helpers'
+import { ScrollView } from 'react-native-gesture-handler'
 
 // Stylesheets
-const styles = require('../stylesheets/mainStylesheet');
+const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/catalogueStyle')
+const ficCardStyle = require('../stylesheets/fanficCardStyle')
 
 class Catalogue extends Component {
     //Constructor
@@ -60,36 +60,53 @@ class Catalogue extends Component {
                 </View>
             )
         }
-        return (
-            <View style={styles.container}>
-                {!this.state.isLoading &&
-                    <View>
-                        <Text style={pageStyle.catalogueTitle}>{this.props.route.params.title}</Text>
-                        <ScrollView>
-                            {this.state.fics.length == 0 && <Text style={pageStyle.noFics}>There are no fanfictions currently in this catalogue</Text>}
-                            {this.state.fics.length > 0 && !this.state.isLoading && (this.state.fics).map((fic, index) => (
-                                <View key={index} style={pageStyle.ficContainer}>
-                                    <View style={pageStyle.ficHeader}>
-                                        {/* Title of catalogue*/}
-                                        <Text style={pageStyle.ficTitle}>{fic.title} </Text>
-                                        {/* Authors of fic */}
-                                        {fic.authors.map((author, index) => (
-                                            <Text style={pageStyle.ficAuthors} key={index}>{author}</Text>
-                                        ))}
-                                    </View>
-                                    {/* Summary of fic */}
-                                    <View style={pageStyle.summaryContainer}>
-                                        {/* If empty - no summary available */}
-                                        {fic.summary == '' && <Text style={pageStyle.ficSummaryEmpty}>No summary available ...</Text>}
+        else
+            return (
+                <View style={styles.container}>
 
-                                        {fic.summary != '' && <Text style={pageStyle.ficSummary}>{fic.summary}</Text>}
-                                    </View>
+                    <View style={pageStyle.headerContainer}>
+                        <View style={pageStyle.buttonContainer}>
+                            <TouchableOpacity
+                                style={pageStyle.buttonStyle}
+                                onPress={() => this.props.navigation.goBack()}
+                            >
+                                <Text style={styles.buttonText}>Back</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={pageStyle.pageTitleContainer}>
+                            <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
+                        </View>
+                    </View>
+
+
+
+
+                    <ScrollView>
+                        {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are no fanfictions currently in this catalogue</Text>}
+                        {this.state.fics.length > 0 && !this.state.isLoading && (this.state.fics).map((fic, index) => (
+                            <Pressable
+                                key={index}
+                                style={({ pressed }) => [ficCardStyle.ficContainer, pressed && ficCardStyle.ficContainerPressed]}>
+                                <View style={ficCardStyle.ficHeader}>
+                                    {/* Title of catalogue*/}
+                                    <Text style={ficCardStyle.ficTitle}>{fic.title} </Text>
+                                    {/* Authors of fic */}
+                                    {fic.authors.map((author, index) => (
+                                        <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
+                                    ))}
                                 </View>
-                            ))}
-                        </ScrollView>
-                    </View>}
-            </View>
-        )
+                                {/* Summary of fic */}
+                                <View style={ficCardStyle.summaryContainer}>
+                                    {/* If empty - no summary available */}
+                                    {fic.summary == '' && <Text style={ficCardStyle.ficSummaryEmpty}>No summary available ...</Text>}
+
+                                    {fic.summary != '' && <Text style={ficCardStyle.ficSummary}>{fic.summary}</Text>}
+                                </View>
+                            </Pressable>
+                        ))}
+                    </ScrollView>
+                </View>
+            )
     }
 }
 

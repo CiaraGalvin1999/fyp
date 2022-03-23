@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import React, { Component } from 'react'
+import { View, Text } from 'react-native'
+
+const styles = require('../stylesheets/mainStylesheet')
 
 class Profile extends Component {
     //Constructor
@@ -8,10 +10,13 @@ class Profile extends Component {
         super();
     }
 
+
     render() {
         return (
-            <View>
-                <Text> Profile! </Text>
+            <View style={styles.container}>
+                <View style={styles.pageTitleContainer}>
+                    <Text style={styles.pageTitleText}> Profile </Text>
+                </View>
             </View>
         )
     }

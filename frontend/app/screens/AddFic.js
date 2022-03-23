@@ -47,8 +47,10 @@ class AddFic extends Component {
     render() {
         return (
             <View style={styles.container}>
-
-                <View style={styles.spaceTop} />
+                <View style={styles.pageTitleContainer}>
+                    <Text style={styles.pageTitleText}> Add Fanfiction </Text>
+                </View>
+                <View style={{ height: '4%' }}></View>
 
                 <View style={styles.fieldContainer}>
                     <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Title</Text></View>

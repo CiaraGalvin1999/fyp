@@ -191,16 +191,19 @@ class AllCatalogues extends Component {
                     </View>
                 </Modal>
 
-
-                <View style={pageStyle.buttonContainer}>
-                    <TouchableOpacity
-                        style={pageStyle.buttonStyle}
-                        onPress={() => this.setState({ catalogueModalVisible: true })}
-                    >
-                        <Text style={styles.buttonText}>Create new catalogue</Text>
-                    </TouchableOpacity>
+                <View style={styles.pageTitleContainer}>
+                    <Text style={styles.pageTitleText}>Catalogues</Text>
                 </View>
+
                 <ScrollView contentContainerStyle={pageStyle.allCataloguesContainer}>
+                    <View style={pageStyle.buttonContainer}>
+                        <TouchableOpacity
+                            style={pageStyle.buttonStyle}
+                            onPress={() => this.setState({ catalogueModalVisible: true })}
+                        >
+                            <Text style={styles.buttonText}>Create new catalogue</Text>
+                        </TouchableOpacity>
+                    </View>
                     {this.state.catalogues.length == 0 && <Text style={styles.mainTextEmpty}>You have no catalogues</Text>}
                     {this.state.catalogues.length > 0 && !this.state.isLoading && (this.state.catalogues).map((catalogue) => (
                         <TouchableOpacity
@@ -211,7 +214,7 @@ class AllCatalogues extends Component {
                             {/* Title of catalogue*/}
                             <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
 
-                            
+
 
                         </TouchableOpacity>
                     ))}

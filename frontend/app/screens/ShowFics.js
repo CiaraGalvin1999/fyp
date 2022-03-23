@@ -1,12 +1,12 @@
 // Imports
-import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Component } from 'react'
+import { Pressable, View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import helpers from '../components/helpers';
-
 // Stylesheets
-const styles = require('../stylesheets/mainStylesheet');
+const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/showFicsStyle')
+const ficCardStyle = require('../stylesheets/fanficCardStyle')
 
 class ShowFics extends Component {
     //Constructor
@@ -127,14 +127,14 @@ class ShowFics extends Component {
 
                                     {/* Catalogue titles */}
                                     <ScrollView style={styles.modalMainContent}>
-                                        {this.state.catalogues.length == 0 && !this.state.isLoading && 
-                                        <View>
-                                            <Text style={pageStyle.noCatalogues}> You have no catalogues </Text>
-                                            <TouchableOpacity 
-                                                onPress={() => this.props.navigation.navigate('authNav', {screen: 'Catalogue'})}> 
-                                                <Text style={pageStyle.createCatalogueButton}>Create a catalogue here</Text>
-                                            </TouchableOpacity>
-                                        </View>
+                                        {this.state.catalogues.length == 0 && !this.state.isLoading &&
+                                            <View>
+                                                <Text style={pageStyle.noCatalogues}> You have no catalogues </Text>
+                                                <TouchableOpacity
+                                                    onPress={() => this.props.navigation.navigate('authNav', { screen: 'Catalogue' })}>
+                                                    <Text style={pageStyle.createCatalogueButton}>Create a catalogue here</Text>
+                                                </TouchableOpacity>
+                                            </View>
 
                                         }
                                         {this.state.catalogues.length > 0 && !this.state.isLoading && (this.state.catalogues).map((catalogue, index) => (
@@ -162,7 +162,6 @@ class ShowFics extends Component {
                         </View>
                     </View>
                 </Modal>
-
                 {/* Back button to go back to search screen (i.e., AddFic) */}
                 <View style={pageStyle.buttonContainer}>
                     <TouchableOpacity
@@ -174,27 +173,31 @@ class ShowFics extends Component {
                 </View>
 
                 {/* Displays fanfics from search on previous screen */}
-                <ScrollView contentContainerStyle={pageStyle.allResultsContainer}>
-                    {results.map((res) => (
-                        <TouchableOpacity
+                <ScrollView>
+                    {results.length == 0 && <Text style={styles.emptyMessage}></Text>}
+                    {results.length > 0 && results.map((res) => (
+                        <Pressable
                             key={res.id}
-                            style={pageStyle.resultContainer}
+                            style={({ pressed }) => [ficCardStyle.ficContainer, pressed && pageStyle.ficContainerPressed]}
                             onPress={() => this.openSelectCatalogueModal(res)}
                         >
-                            {/* Title of fic*/}
-                            <Text style={pageStyle.headingText}>{res.title} </Text>
-                            {/* Authors of fic */}
-                            {res.authors.map((author, index) => (
-                                <Text style={pageStyle.subheadingText} key={index}>{author}</Text>
-                            ))}
-                            {/* Summary of fic */}
-                            <View style={[pageStyle.mainTextContainer, res.summary != '' && pageStyle.summaryContainer]}>
-                                {/* If empty - no summary available */}
-                                {res.summary == '' && <Text style={pageStyle.mainTextEmpty}>No summary available ...</Text>}
-
-                                {res.summary != '' && <Text style={pageStyle.mainText}>{res.summary}</Text>}
+                            <View style={ficCardStyle.ficHeader}>
+                                {/* Title of fic*/}
+                                <Text style={ficCardStyle.ficTitle}>{res.title} </Text>
+                                {/* Authors of fic */}
+                                {res.authors.map((author, index) => (
+                                    <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
+                                ))}
                             </View>
-                        </TouchableOpacity>
+                            {/* Summary of fic */}
+                            <View style={ficCardStyle.summaryContainer}>
+                                {/* If empty - no summary available */}
+                                {res.summary == '' && <Text style={ficCardStyle.ficSummaryEmpty}>No summary available ...</Text>}
+
+                                {res.summary != '' && <Text style={ficCardStyle.ficSummary}>{res.summary}</Text>}
+                            </View>
+
+                        </Pressable>
                     ))}
                 </ScrollView>
             </View>

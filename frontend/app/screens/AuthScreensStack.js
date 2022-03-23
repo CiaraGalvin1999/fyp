@@ -37,8 +37,8 @@ const AuthStackScreen = ({ navigation }) => (
             },
             tabBarActiveTintColor: '#57a5c9',
             tabBarInactiveTintColor: '#F3F8F2',
-            tabBarActiveBackgroundColor: "#202226",
-            tabBarInactiveBackgroundColor: '#202226',
+            tabBarActiveBackgroundColor: "#121212",
+            tabBarInactiveBackgroundColor: '#121212',
         })}
     >
         <Tab.Screen name="Dashboard" component={Dashboard} options={{ tabBarShowLabel: false }} />

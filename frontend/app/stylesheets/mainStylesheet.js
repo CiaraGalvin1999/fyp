@@ -6,14 +6,23 @@ module.exports = StyleSheet.create({
         backgroundColor: '#121212',
         flex: 1,
     },
+    pageTitleContainer: {
+        padding: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F8F2',
+        justifyContent: 'center',
+    },
+    pageTitleText: {
+        textAlign: 'center',
+        fontSize: 20,
+        color: '#F3F8F2',
+        fontFamily: 'Roboto',
+    },
     loadingView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#202226'
-    },
-    spaceTop: {
-        height: '8%',
+        backgroundColor: '#121212'
     },
     logoContainer: {
         justifyContent: 'center',
@@ -125,5 +134,13 @@ module.exports = StyleSheet.create({
         paddingTop: 8,
         paddingLeft: 4,
         color: '#52FFB8',
+    },
+    // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
+    emptyMessage: {
+        padding: 10,
+        color: '#F3F8F2',
+        fontStyle: 'italic',
+        opacity: 0.75,
+        textAlign: 'center'
     },
 });
