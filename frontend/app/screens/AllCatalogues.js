@@ -165,11 +165,11 @@ class AllCatalogues extends Component {
                                 {this.state.notUniqueTitleError && <Text style={styles.requiredErrorMessage}>You cannot have two catalogues with the same name</Text>}
                                 <Text style={styles.textInputTitle}>Title<Text style={styles.required}> *</Text></Text>
                                 <TextInput
-                                    style={{ color: '#F3F8F2' }}
+                                    style={{ color: '#FFFFFF' }}
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     placeholder="Enter title..."
-                                    placeholderTextColor='#F3F8F2'
+                                    placeholderTextColor='#CBCBCB'
                                     onChangeText={this.updateNewTitle}
                                 ></TextInput>
                             </View>

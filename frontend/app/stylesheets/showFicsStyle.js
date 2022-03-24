@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 module.exports = StyleSheet.create({
     buttonStyle: {
         width: '100%',
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 10,
@@ -28,19 +28,19 @@ module.exports = StyleSheet.create({
     },
     catalogueText: {
         fontSize: 14,
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         paddingTop: 6,
         paddingBottom: 6
     },
     noCatalogues: {
-        color: '#f3f8f2',
+        color: '#FFFFFF',
         padding: 10,
         paddingBottom: 16,
         textAlign: 'center',
         fontStyle: 'italic'
     },
     createCatalogueButton: {
-        color: '#28617B',
+        color: '#2F7571',
         padding: 10,
         paddingTop: 0,
         textAlign: 'center'

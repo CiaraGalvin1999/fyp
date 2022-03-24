@@ -35,10 +35,10 @@ const AuthStackScreen = ({ navigation }) => (
                 // You can return any component that you like here!
                 return <Ionicons name={iconName} size={size} color={color} />;
             },
-            tabBarActiveTintColor: '#57a5c9',
-            tabBarInactiveTintColor: '#F3F8F2',
-            tabBarActiveBackgroundColor: "#121212",
-            tabBarInactiveBackgroundColor: '#121212',
+            tabBarActiveTintColor: '#50B9B6',
+            tabBarInactiveTintColor: '#FFFFFF',
+            tabBarActiveBackgroundColor: "#0A0A0A",
+            tabBarInactiveBackgroundColor: '#0A0A0A',
         })}
     >
         <Tab.Screen name="Dashboard" component={Dashboard} options={{ tabBarShowLabel: false }} />

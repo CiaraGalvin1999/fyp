@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Pressable, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native'
+import React, { Component, useCallback } from 'react'
+import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert} from 'react-native'
 import helpers from '../components/helpers'
 import { ScrollView } from 'react-native-gesture-handler'
 
@@ -7,6 +7,31 @@ import { ScrollView } from 'react-native-gesture-handler'
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/catalogueStyle')
 const ficCardStyle = require('../stylesheets/fanficCardStyle')
+
+const OpenFic = ({ ficID }) => {
+    const handlePress = useCallback(async () => {
+        // Create url - add work ID to end of link
+        url = 'https://archiveofourown.org/works/' + ficID + '/'
+
+        // Use Linking to open url
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+            await Linking.openURL(url);
+        } else {
+            Alert.alert(`Unable to open ${url}`);
+        }
+        
+    }, [ficID]);
+
+    return (
+        <View style={ficCardStyle.ficFooter}>
+            <TouchableOpacity onPress={handlePress}>
+                <Text style={ficCardStyle.openFicLink}>Click here to open fanfiction on AO3</Text>
+            </TouchableOpacity>
+        </View>
+
+    )
+};
 
 class Catalogue extends Component {
     //Constructor
@@ -65,14 +90,12 @@ class Catalogue extends Component {
                 <View style={styles.container}>
 
                     <View style={pageStyle.headerContainer}>
-                        <View style={pageStyle.buttonContainer}>
                             <TouchableOpacity
                                 style={pageStyle.buttonStyle}
                                 onPress={() => this.props.navigation.goBack()}
                             >
                                 <Text style={styles.buttonText}>Back</Text>
                             </TouchableOpacity>
-                        </View>
                         <View style={pageStyle.pageTitleContainer}>
                             <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
                         </View>
@@ -84,9 +107,10 @@ class Catalogue extends Component {
                     <ScrollView>
                         {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are no fanfictions currently in this catalogue</Text>}
                         {this.state.fics.length > 0 && !this.state.isLoading && (this.state.fics).map((fic, index) => (
-                            <Pressable
+
+                            <View
                                 key={index}
-                                style={({ pressed }) => [ficCardStyle.ficContainer, pressed && ficCardStyle.ficContainerPressed]}>
+                                style={ficCardStyle.ficContainer}>
                                 <View style={ficCardStyle.ficHeader}>
                                     {/* Title of catalogue*/}
                                     <Text style={ficCardStyle.ficTitle}>{fic.title} </Text>
@@ -95,6 +119,7 @@ class Catalogue extends Component {
                                         <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
                                     ))}
                                 </View>
+                                <View style={ficCardStyle.dividerContainer}><View style={ficCardStyle.divider}></View></View>
                                 {/* Summary of fic */}
                                 <View style={ficCardStyle.summaryContainer}>
                                     {/* If empty - no summary available */}
@@ -102,7 +127,8 @@ class Catalogue extends Component {
 
                                     {fic.summary != '' && <Text style={ficCardStyle.ficSummary}>{fic.summary}</Text>}
                                 </View>
-                            </Pressable>
+                                <OpenFic ficID={fic.workid}></OpenFic>
+                            </View>
                         ))}
                     </ScrollView>
                 </View>

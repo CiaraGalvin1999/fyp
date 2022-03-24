@@ -19,5 +19,7 @@ urlpatterns = [
     # Get specific catalogue and return all info including fics
     path('getCatalogue/', views.getCatalogue, name='get_catalogue'),
     # Create a new catalogue
-    path('createCatalogue/', views.createCatalogue, name='create_catalogue')
+    path('createCatalogue/', views.createCatalogue, name='create_catalogue'),
+    # Get info needed for profile view
+    path('getUserInfo/', views.getUserInfo, name='get_user_info'),
 ]

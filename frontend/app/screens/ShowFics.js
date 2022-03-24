@@ -174,11 +174,11 @@ class ShowFics extends Component {
 
                 {/* Displays fanfics from search on previous screen */}
                 <ScrollView>
-                    {results.length == 0 && <Text style={styles.emptyMessage}></Text>}
+                    {results.length == 0 && <Text style={styles.emptyMessage}>There are no results. Try search again with different parameters!</Text>}
                     {results.length > 0 && results.map((res) => (
                         <Pressable
                             key={res.id}
-                            style={({ pressed }) => [ficCardStyle.ficContainer, pressed && pageStyle.ficContainerPressed]}
+                            style={({ pressed }) => [ficCardStyle.ficContainer, pressed && ficCardStyle.ficContainerPressed]}
                             onPress={() => this.openSelectCatalogueModal(res)}
                         >
                             <View style={ficCardStyle.ficHeader}>
@@ -189,6 +189,7 @@ class ShowFics extends Component {
                                     <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
                                 ))}
                             </View>
+                            <View style={ficCardStyle.dividerContainer}><View style={ficCardStyle.divider}></View></View>
                             {/* Summary of fic */}
                             <View style={ficCardStyle.summaryContainer}>
                                 {/* If empty - no summary available */}

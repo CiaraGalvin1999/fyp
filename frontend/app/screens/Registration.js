@@ -68,11 +68,11 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Username <Text style={styles.required}>*</Text></Text></View>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Username <Text style={styles.required}>*</Text></Text></View>
                         <TextInput
                             style={styles.field}
                             placeholder="Choose a username..."
-                            placeholderTextColor='#57a5c9'
+                            placeholderTextColor='#CBCBCB'
                             autoCorrect={false}
                             autoCapitalize="none"
                             onChangeText={this.updateUsername}
@@ -80,11 +80,11 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Email Address</Text></View>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Email Address</Text></View>
                         <TextInput
                             style={styles.field}
                             placeholder="Enter your email..."
-                            placeholderTextColor='#57a5c9'
+                            placeholderTextColor='#CBCBCB'
                             autoCorrect={false}
                             autoCapitalize="none"
                             onChangeText={this.updateEmail}
@@ -92,38 +92,38 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Password <Text style={styles.required}>*</Text></Text></View>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Password <Text style={styles.required}>*</Text></Text></View>
                         <TextInput
                             style={styles.field}
                             secureTextEntry
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter a password..."
-                            placeholderTextColor='#57a5c9'
+                            placeholderTextColor='#CBCBCB'
                             onChangeText={this.updatePassword}
                         ></TextInput>
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>First Name</Text></View>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>First Name</Text></View>
                         <TextInput
                             style={styles.field}
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter your first name..."
-                            placeholderTextColor='#57a5c9'
+                            placeholderTextColor='#CBCBCB'
                             onChangeText={this.updateFirstName}
                         ></TextInput>
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: 'white' }}>Surname</Text></View>
+                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Surname</Text></View>
                         <TextInput
                             style={styles.field}
                             autoCapitalize="none"
                             autoCorrect={false}
                             placeholder="Enter your surname..."
-                            placeholderTextColor='#57a5c9'
+                            placeholderTextColor='#CBCBCB'
                             onChangeText={this.updateLastName}
                         ></TextInput>
 

@@ -61,11 +61,11 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Username</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Username</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter username..."
-                        placeholderTextColor='#57a5c9'
+                        placeholderTextColor='#CBCBCB'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateUsername}
@@ -73,14 +73,14 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Password</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Password</Text></View>
                     <TextInput
                         style={styles.field}
                         secureTextEntry
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Enter password..."
-                        placeholderTextColor='#57a5c9'
+                        placeholderTextColor='#CBCBCB'
                         onChangeText={this.updatePassword}
                     ></TextInput>
 

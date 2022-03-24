@@ -3,26 +3,26 @@ import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
     container: {
-        backgroundColor: '#121212',
+        backgroundColor: '#0A0A0A',
         flex: 1,
     },
     pageTitleContainer: {
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#F3F8F2',
+        borderBottomColor: '#FFFFFF',
         justifyContent: 'center',
     },
     pageTitleText: {
         textAlign: 'center',
         fontSize: 20,
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         fontFamily: 'Roboto',
     },
     loadingView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#121212'
+        backgroundColor: '#0A0A0A'
     },
     logoContainer: {
         justifyContent: 'center',
@@ -35,16 +35,22 @@ module.exports = StyleSheet.create({
     fieldContainer: {
         alignItems: 'center',
     },
+    fieldTitle: {
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontFamily: 'Roboto'
+    },
     field: {
         width: '80%',
-        borderColor: '#57a5c9',
+        borderColor: '#CBCBCB',
         borderBottomWidth: 1,
-        color: '#F3F8F2',
+        fontSize: 14,
+        color: '#FFFFFF'
     },
     buttonStyle: {
         minWidth: '60%',
         height: 45,
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 15,
@@ -55,24 +61,24 @@ module.exports = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
     },
     textInputTitle: {
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         paddingLeft: 4,
         paddingTop: 4,
     },
     required: {
-        color: '#52FFB8',
+        color: '#FF6C0A',
     },
     redirectText: {
         margin: 5,
-        color: '#F3F8F2',
+        color: '#FFFFFF',
     },
     linkText: {
-        color: '#57a5c9',
+        color: '#5DCDE9',
     },
     modalContent: {
         flex: 1,
@@ -88,18 +94,18 @@ module.exports = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.9)'
     },
     modalMain: {
-        backgroundColor: '#202226',
+        backgroundColor: '#121212',
     },
     modalHeader: {
-        backgroundColor: '#202226',
+        backgroundColor: '#121212',
         paddingTop: 10,
         paddingBottom: 10,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#F3F8F2'
+        borderBottomColor: '#FFFFFF'
 
     },
     modalHeaderText: {
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         fontSize: 16,
         textAlign: 'center'
     },
@@ -112,33 +118,33 @@ module.exports = StyleSheet.create({
     modalHalfButton: {
         width: '50%',
         height: 40,
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
     },
     modalFullButton: {
         width: '100%',
         height: 40,
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
     },
     modalCloseButton: {
         width: '50%',
         height: 40,
-        backgroundColor: '#181818',
+        backgroundColor: '#0A0A0A',
         alignItems: 'center',
         justifyContent: 'center',
     },
     requiredErrorMessage: {
         paddingTop: 8,
         paddingLeft: 4,
-        color: '#52FFB8',
+        color: '#FF6C0A',
     },
     // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
     emptyMessage: {
         padding: 10,
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         opacity: 0.75,
         textAlign: 'center'

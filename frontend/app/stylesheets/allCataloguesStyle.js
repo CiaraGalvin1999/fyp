@@ -8,18 +8,19 @@ module.exports = StyleSheet.create({
         justifyContent: 'center'
     },
     catalogueContainer: {
-        backgroundColor: '#181818',
+        backgroundColor: '#121212',
         width: '95%',
         paddingTop: 20,
         paddingBottom: 20,
         marginBottom: 20,
         borderRadius: 5,
         borderWidth: 1,
+        borderColor: '#3D3D3D',
     },
     buttonStyle: {
         width: '95%',
         height: 45,
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 15,
@@ -31,7 +32,7 @@ module.exports = StyleSheet.create({
         paddingTop: 16
     },
     catalogueTitle: {
-        color: '#f3f8f2',
+        color: '#FFFFFF',
         textAlign: 'center',
         fontSize: 16,
     }

@@ -225,7 +225,7 @@ def getCatalogue(request):
                 summary = fic.summary
             
             # Create JSON object
-            resultJSON = {'title': title, 'authors': authors, 'id': workid, 'summary': summary}
+            resultJSON = {'title': title, 'authors': authors, 'workid': workid, 'summary': summary}
             fics.append(resultJSON)
 
     fics = json.dumps(fics)
@@ -249,3 +249,32 @@ def createCatalogue(request):
     data = getCataloguesHelper(request)
 
     return Response(data)
+
+@api_view(('GET',))
+def getUserInfo(request):
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get number of catalogues associated with user
+    catalogues = Catalogue.objects.filter(user=user).order_by('-id')
+    numCatalogues = catalogues.count()
+
+    recentCatalogues = catalogues[:6]
+
+    catalogues = []
+    for c in recentCatalogues:
+        title = c.title
+        id = c.id
+        catalogue = {'title': title, 'id': id}
+        catalogues.append(catalogue)
+    print(catalogues)
+        
+    # Add username of user, number of catalogues they have, 6 most recent catalogues etc, ...... to data to be returned
+    data = {'username': user.username, 'numCatalogues': numCatalogues, 'recentCatalogues': catalogues}
+
+    # Respond with user data
+    data = json.dumps(data)
+    return Response(data)
+

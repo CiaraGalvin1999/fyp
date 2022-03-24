@@ -3,27 +3,27 @@ import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
     headerContainer:{
+        width: '100%',
         flexDirection: 'row',
         paddingTop: 12,
         paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#F3F8F2',
+        borderBottomColor: '#FFFFFF',
     },
     pageTitleContainer: {
-        width: '70%',
+        width: '60%',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        marginLeft: '7%',
-        marginRight: '5%',
+        paddingLeft: 16,
+        alignItems: 'center'
     },
     pageTitleText: {
         fontSize: 20,
-        color: '#F3F8F2',
+        color: '#FFFFFF',
         fontFamily: 'Roboto',
     },
     buttonStyle: {
-        width: '100%',
-        backgroundColor: '#28617B',
+        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,

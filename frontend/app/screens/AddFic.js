@@ -53,11 +53,11 @@ class AddFic extends Component {
                 <View style={{ height: '4%' }}></View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Title</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Title</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter title..."
-                        placeholderTextColor='#57a5c9'
+                        placeholderTextColor='#CBCBCB'
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={this.updateTitle}
@@ -65,13 +65,13 @@ class AddFic extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={{ color: '#F3F8F2' }}>Author</Text></View>
+                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Author</Text></View>
                     <TextInput
                         style={styles.field}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Enter author..."
-                        placeholderTextColor='#57a5c9'
+                        placeholderTextColor='#CBCBCB'
                         onChangeText={this.updateAuthor}
                     ></TextInput>
 
