@@ -57,14 +57,4 @@ module.exports = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center'
     },
-    dividerContainer: {
-        width: '100%',
-        alignItems: 'center'
-    },
-    divider: {
-        width: '15%',
-        backgroundColor: '#2F7571',
-        opacity: 0.75,
-        height: 2
-    },
 });

@@ -19,11 +19,12 @@ module.exports = StyleSheet.create({
     },
     buttonStyle: {
         width: '95%',
-        height: 45,
+        height: 40,
         backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 15,
+        borderRadius: 5,
     },
     buttonContainer: {
         width: '100%',

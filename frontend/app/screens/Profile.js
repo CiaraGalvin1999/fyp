@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, Image, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
 import helpers from '../components/helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Divider from '../components/Divider';
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/profileStyle')
@@ -17,6 +18,7 @@ class Profile extends Component {
             avatar: null,
             isLoading: true,
             numCatalogues: 0,
+            numFriends: 0,
             about: '',
             recentCatalogues: []
         }
@@ -42,7 +44,7 @@ class Profile extends Component {
             // Saves catalogues to state and changes isLoading boolean to false
             .then(data => JSON.parse(data))
             .then(data => {
-                this.setState({ username: data.username, numCatalogues: data.numCatalogues, recentCatalogues: data.recentCatalogues, isLoading: false })
+                this.setState({ username: data.username, numCatalogues: data.numCatalogues, numFriends: data.numFriends, recentCatalogues: data.recentCatalogues, isLoading: false })
             });
     }
 
@@ -63,22 +65,24 @@ class Profile extends Component {
             return (
                 <View style={styles.container}>
                     <View style={pageStyle.headerContainer}>
-                        <View style={pageStyle.addFriendsButton}>
-                            <Ionicons name={'person-add-outline'} size={24} color={'#FFFFFF'} />
-                        </View>
+                        <TouchableOpacity 
+                        style={pageStyle.addFriendsButton}
+                        onPress={()=>this.props.navigation.navigate('Friends')}
+                        >
+                            <Ionicons name={'people-outline'} size={24} color={'#FFFFFF'} />
+                        </TouchableOpacity>
                         <View style={pageStyle.pageTitleContainer}>
                             <Text style={styles.pageTitleText}>Profile</Text>
                         </View>
-                        <View style={pageStyle.settingsButton}>
+                        <TouchableOpacity style={pageStyle.settingsButton}>
                             <Ionicons name={'settings-outline'} size={24} color={'#FFFFFF'} />
-                        </View>
+                        </TouchableOpacity>
                     </View>
                     <ScrollView>
                         <View style={pageStyle.profileContainer}>
                             <Image
                                 style={pageStyle.avatar}
-                                // source={{ uri: 'https://api.multiavatar.com/' + this.state.username + '.png' }}
-                                source={{ uri: 'https://api.multiavatar.com/andrewchang.png' }}
+                                source={{ uri: 'https://api.multiavatar.com/' + this.state.username + '.png' }}      
                             />
 
                             <Text style={pageStyle.username}>@{this.state.username}</Text>
@@ -88,35 +92,41 @@ class Profile extends Component {
                                 <Text style={pageStyle.countText}>Catalogues{'\n'}{this.state.numCatalogues}</Text>
                             </View>
                             <View style={pageStyle.count}>
-                                <Text style={pageStyle.countText}>Followers{'\n'}102</Text>
-                            </View>
-                            <View style={pageStyle.count}>
-                                <Text style={pageStyle.countText}>Following{'\n'}4</Text>
+                                <Text style={pageStyle.countText}>Friends{'\n'}{this.state.numFriends}</Text>
                             </View>
                         </View>
-                        <View style={pageStyle.aboutContainer}>
-                            {this.state.about.length > 0 && <Text style={pageStyle.aboutText}>{this.state.about}</Text>}
-                        </View>
-                        <Text style={pageStyle.catalogueSectionTitle}>Recent Catalogues</Text>
+                        {this.state.about.length > 0 &&<View style={pageStyle.aboutContainer}>
+                             <Text style={pageStyle.aboutText}>{this.state.about}</Text>
+                        </View>}
+                        <Divider/>
+                        <Text style={pageStyle.sectionTitle}>Recent Catalogues</Text>
                         <ScrollView horizontal={true} style={pageStyle.cataloguesContainer}>
                             {this.state.recentCatalogues.length > 0 && !this.state.isLoading && (this.state.recentCatalogues).map((catalogue) => (
                                 <TouchableOpacity
                                     key={catalogue.id}
                                     style={pageStyle.catalogueContainer}
-                                //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
+                                    onPress={() => this.props.navigation.navigate('CatalogueStack', {
+                                        screen: 'Catalogue',
+                                        params: catalogue,
+                                        initial: false
+                                      })}
                                 >
                                     {/* Title of catalogue*/}
                                     <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
-
-
-
                                 </TouchableOpacity>
+
                             ))}
                         </ScrollView>
-
-                        {/*<View style={{height:80,width:110, backgroundColor:'#2F7571',marginLeft:6, marginTop:6}}></View>*/}
-
-
+                        <View style={pageStyle.buttonContainer}>
+                            <TouchableOpacity
+                                style={pageStyle.buttonStyle}
+                                onPress={() => this.props.navigation.navigate('CatalogueStack', { screen: 'AllCatalogues'})}
+                            >
+                                <Text style={styles.buttonText}>View all catalogues</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Divider/>
+                        <Text style={pageStyle.sectionTitle}>Recent Activity</Text>
                     </ScrollView>
                 </View>
             )

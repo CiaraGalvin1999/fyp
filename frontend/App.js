@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import UnauthStackScreen from './app/screens/UnauthScreensStack';
-import AuthStackScreen from './app/screens/AuthScreensStack';
+import UnauthStackScreen from './app/navigators/UnauthScreensStack';
+import AuthStackScreen from './app/navigators/AuthScreensStack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Parent navigator

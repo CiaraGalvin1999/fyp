@@ -3,8 +3,8 @@ import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 
 // Import screens
-import AllCatalogues from './AllCatalogues'
-import Catalogue from './Catalogue'
+import AllCatalogues from '../screens/AllCatalogues'
+import Catalogue from '../screens/Catalogue'
 
 // Stack of screens for when user is not authorised i.e., not logged in
 // Will contain login and registration screens

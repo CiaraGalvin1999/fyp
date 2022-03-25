@@ -3,8 +3,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Import screens
-import Login from './Login';
-import Registration from './Registration';
+import Login from '../screens/Login';
+import Registration from '../screens/Registration';
 
 // Stack of screens for when user is not authorised i.e., not logged in
 // Will contain login and registration screens

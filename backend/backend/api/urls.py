@@ -22,4 +22,6 @@ urlpatterns = [
     path('createCatalogue/', views.createCatalogue, name='create_catalogue'),
     # Get info needed for profile view
     path('getUserInfo/', views.getUserInfo, name='get_user_info'),
+    # Get list of users friends
+    path('getFriends/', views.getFriends, name='get_friends')
 ]

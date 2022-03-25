@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { Pressable, View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
+import Divider from '../components/Divider';
 import helpers from '../components/helpers';
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet')
@@ -189,7 +190,7 @@ class ShowFics extends Component {
                                     <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
                                 ))}
                             </View>
-                            <View style={ficCardStyle.dividerContainer}><View style={ficCardStyle.divider}></View></View>
+                            <Divider />
                             {/* Summary of fic */}
                             <View style={ficCardStyle.summaryContainer}>
                                 {/* If empty - no summary available */}

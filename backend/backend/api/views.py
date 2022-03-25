@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from django.contrib.auth.models import User
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
+from friendship.models import Friend, Follow, Block
 
 import AO3
 import json
@@ -269,12 +270,32 @@ def getUserInfo(request):
         id = c.id
         catalogue = {'title': title, 'id': id}
         catalogues.append(catalogue)
-    print(catalogues)
+
+    
+    # Get number of friends
+    numFriends = len(Friend.objects.friends(user))
         
     # Add username of user, number of catalogues they have, 6 most recent catalogues etc, ...... to data to be returned
-    data = {'username': user.username, 'numCatalogues': numCatalogues, 'recentCatalogues': catalogues}
+    data = {'username': user.username, 'numCatalogues': numCatalogues, 'numFriends': numFriends, 'recentCatalogues': catalogues}
 
     # Respond with user data
+    data = json.dumps(data)
+    return Response(data)
+
+@api_view(('GET',))
+def getFriends(request):
+    # Get token and associated user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    friends = Friend.objects.friends(user)
+
+    data = []
+
+    for f in friends:
+        data.append(f.username)
+
     data = json.dumps(data)
     return Response(data)
 

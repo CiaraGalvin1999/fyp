@@ -1,7 +1,8 @@
 import React, { Component, useCallback } from 'react'
-import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert} from 'react-native'
+import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert } from 'react-native'
 import helpers from '../components/helpers'
 import { ScrollView } from 'react-native-gesture-handler'
+import Divider from '../components/Divider'
 
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet')
@@ -20,7 +21,7 @@ const OpenFic = ({ ficID }) => {
         } else {
             Alert.alert(`Unable to open ${url}`);
         }
-        
+
     }, [ficID]);
 
     return (
@@ -70,6 +71,17 @@ class Catalogue extends Component {
                     this.setState({ fics: JSON.parse(data), isLoading: false })
                 });
         });
+
+
+
+        // TO DO
+        // This is a workaround to make it not look funky when a catalogue is navigated to from profile
+        // Works fine actually but not sure that it is the best way to do this
+        // Must make state reset when catalogue is blurred or smth idk
+        // React native navigation reset can be used
+        this.focusListener = navigation.addListener("blur", async () => {
+            this.setState({ fics: [], isLoading: true })
+        });
     }
 
     componentWillUnmount() {
@@ -90,12 +102,12 @@ class Catalogue extends Component {
                 <View style={styles.container}>
 
                     <View style={pageStyle.headerContainer}>
-                            <TouchableOpacity
-                                style={pageStyle.buttonStyle}
-                                onPress={() => this.props.navigation.goBack()}
-                            >
-                                <Text style={styles.buttonText}>Back</Text>
-                            </TouchableOpacity>
+                        <TouchableOpacity
+                            style={pageStyle.buttonStyle}
+                            onPress={() => this.props.navigation.goBack()}
+                        >
+                            <Text style={styles.buttonText}>Back</Text>
+                        </TouchableOpacity>
                         <View style={pageStyle.pageTitleContainer}>
                             <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
                         </View>
@@ -119,7 +131,7 @@ class Catalogue extends Component {
                                         <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
                                     ))}
                                 </View>
-                                <View style={ficCardStyle.dividerContainer}><View style={ficCardStyle.divider}></View></View>
+                                <Divider/>
                                 {/* Summary of fic */}
                                 <View style={ficCardStyle.summaryContainer}>
                                     {/* If empty - no summary available */}

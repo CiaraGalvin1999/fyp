@@ -3,14 +3,15 @@ import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
     buttonStyle: {
-        width: '100%',
+        height: 40,
+        width: 60,
         backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 10,
-        padding: 9.5,
         marginLeft: 15,
-        marginTop: 14
+        marginTop: 14,
+        borderRadius: 5,
     },
     buttonContainer: {
         width: '20%',
