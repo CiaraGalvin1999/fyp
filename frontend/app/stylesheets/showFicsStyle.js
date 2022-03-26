@@ -2,20 +2,6 @@
 import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
-    buttonStyle: {
-        height: 40,
-        width: 60,
-        backgroundColor: '#2F7571',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 10,
-        marginLeft: 15,
-        marginTop: 14,
-        borderRadius: 5,
-    },
-    buttonContainer: {
-        width: '20%',
-    },
     catalogueContainer1: {
         alignItems: 'center',
         justifyContent: 'center',

@@ -64,18 +64,18 @@ class Profile extends Component {
         else
             return (
                 <View style={styles.container}>
-                    <View style={pageStyle.headerContainer}>
+                    <View style={styles.headerContainer}>
                         <TouchableOpacity 
-                        style={pageStyle.addFriendsButton}
+                        style={styles.leftButton}
                         onPress={()=>this.props.navigation.navigate('Friends')}
                         >
-                            <Ionicons name={'people-outline'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'people'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
-                        <View style={pageStyle.pageTitleContainer}>
+                        <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Profile</Text>
                         </View>
-                        <TouchableOpacity style={pageStyle.settingsButton}>
-                            <Ionicons name={'settings-outline'} size={24} color={'#FFFFFF'} />
+                        <TouchableOpacity style={styles.rightButton}>
+                            <Ionicons name={'settings'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
                     </View>
                     <ScrollView>

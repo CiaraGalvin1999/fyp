@@ -2,8 +2,11 @@
 import React, { Component } from 'react'
 import { Pressable, View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import Divider from '../components/Divider';
-import helpers from '../components/helpers';
+import Divider from '../components/Divider'
+import helpers from '../components/helpers'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+
+
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/showFicsStyle')
@@ -164,12 +167,12 @@ class ShowFics extends Component {
                     </View>
                 </Modal>
                 {/* Back button to go back to search screen (i.e., AddFic) */}
-                <View style={pageStyle.buttonContainer}>
+                <View style={styles.headerContainer}>
                     <TouchableOpacity
-                        style={pageStyle.buttonStyle}
+                        style={styles.leftButton}
                         onPress={() => this.props.navigation.goBack()}
                     >
-                        <Text style={styles.buttonText}>Back</Text>
+                        <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
                     </TouchableOpacity>
                 </View>
 

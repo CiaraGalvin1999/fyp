@@ -23,5 +23,13 @@ urlpatterns = [
     # Get info needed for profile view
     path('getUserInfo/', views.getUserInfo, name='get_user_info'),
     # Get list of users friends
-    path('getFriends/', views.getFriends, name='get_friends')
+    path('getFriends/', views.getFriends, name='get_friends'),
+    # Search for users
+    path('searchUsers/', views.searchUsers, name='search_users'),
+    # Get friend requests for user
+    path('getFriendRequests/', views.getFriendRequests, name='get_friend_requests'),
+    # Accept friend request
+    path('acceptFriendRequest/', views.acceptFriendRequest, name='accept_friend_request'),
+    # Deny friend request
+    path('denyFriendRequest/', views.denyFriendRequest, name='deny_friend_reqeust'),
 ]

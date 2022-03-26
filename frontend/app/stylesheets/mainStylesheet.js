@@ -6,14 +6,35 @@ module.exports = StyleSheet.create({
         backgroundColor: '#0A0A0A',
         flex: 1,
     },
-    pageTitleContainer: {
-        padding: 20,
+    headerContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        paddingTop: 12,
+        paddingBottom: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#FFFFFF',
+    },
+    leftButton: {
+        width: '15%',
+        alignItems: 'flex-start',
+        paddingLeft: '4%',
+    },
+    rightButton: {
+        width: '15%',
+        alignItems: 'flex-end',
+        paddingRight: '4%',
+    },
+    pageTitleContainer: {
+        width: '100%',
         justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingLeft: 16,
+        alignItems: 'center'
+    },
+    containsLeftButton: {
+        width: '70%',
     },
     pageTitleText: {
-        textAlign: 'center',
         fontSize: 20,
         color: '#FFFFFF',
         fontFamily: 'Roboto',
@@ -23,6 +44,9 @@ module.exports = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#0A0A0A'
+    },
+    spaceTop: {
+        height: 16,
     },
     logoContainer: {
         justifyContent: 'center',
@@ -50,10 +74,12 @@ module.exports = StyleSheet.create({
     buttonStyle: {
         minWidth: '60%',
         height: 45,
-        backgroundColor: '#2F7571',
+        borderWidth: 1,
+        borderColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 15,
+        borderRadius: 5,
     },
     buttonContainer: {
         width: '80%',

@@ -21,7 +21,7 @@ const AuthStackScreen = ({ navigation }) => (
                 let iconName;
 
                 if (route.name === 'Dashboard') {
-                    iconName = focused ? 'planet-outline' : 'planet';
+                    iconName = focused ? 'home-outline' : 'home';
                 } else if (route.name === 'CatalogueStack') {
                     iconName = focused ? 'book-outline' : 'book';
                 } else if (route.name === 'ProfileStack') {

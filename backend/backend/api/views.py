@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from django.contrib.auth.models import User
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
-from friendship.models import Friend, Follow, Block
+from friendship.models import Friend, FriendshipRequest, Follow, Block
 
 import AO3
 import json
@@ -294,8 +294,112 @@ def getFriends(request):
     data = []
 
     for f in friends:
-        data.append(f.username)
+        username = f.username
+        friendID = f.id
+        friend = {'username': username, 'id': friendID}
+        data.append(friend)
 
     data = json.dumps(data)
     return Response(data)
 
+
+@api_view(('GET',))
+def searchUsers(request):
+    # Get username of logged in user that searched for other users
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+    currentUsername = user.username
+
+    # Get username sent in request/searched for
+    username = request.GET.get('username')
+
+    # Search for this user with partial matches
+    users = User.objects.filter(username__icontains=username) 
+
+    # Exclude current user from results if in it
+    users = users.exclude(username__contains=currentUsername)
+
+    # Get users friends
+    friends = Friend.objects.friends(user)
+
+    # Exclude users that current user is already friends with
+    for f in friends: 
+        users = users.exclude(username__contains=f.username)
+
+    # Create JSON response that contains username and ID of users in result
+    data = []
+
+    for u in users:
+        username = u.username
+        userID = u.id
+        user = {'username': username, 'id': userID}
+        data.append(user)
+
+    data = json.dumps(data)
+    return Response(data)
+
+
+@api_view(('GET',))
+def getFriendRequests(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get friend requests for associated user
+    friendRequests = Friend.objects.unread_requests(user=user)
+
+    data = []
+
+    for request in friendRequests: 
+        user = request.from_user
+        username = user.username
+        userID = user.id
+        requestID = request.id
+
+        friendRequest = {'username': username, 'id': userID}
+        data.append(friendRequest)
+
+    data = json.dumps(data)
+
+    # Return success response
+    return Response(data)
+
+
+@api_view(('POST',))
+def acceptFriendRequest(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get user that sent request
+    body = json.loads(request.body)
+    userID = body['id']
+    otherUser = User.objects.get(id=userID)
+
+    friend_request = FriendshipRequest.objects.get(from_user=otherUser, to_user=currentUser)
+    friend_request.accept()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(('POST',))
+def denyFriendRequest(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get user that sent request
+    body = json.loads(request.body)
+    userID = body['id']
+    otherUser = User.objects.get(id=userID)
+
+    friend_request = FriendshipRequest.objects.get(from_user=request.user, to_user=other_user)
+    friend_request.reject()
+    
+    # Return success response
+    return Response(status=status.HTTP_200_OK)

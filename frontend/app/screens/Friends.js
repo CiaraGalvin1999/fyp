@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator} from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Image, TextInput } from 'react-native'
 import helpers from '../components/helpers'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/friendsStyle')
+const userCardStyle = require('../stylesheets/userCardStyle')
 
 class Friends extends Component {
     //Constructor
@@ -37,15 +39,12 @@ class Friends extends Component {
             .then(data => JSON.parse(data))
             .then(data => {
                 this.setState({ friends: data, isLoading: false })
-                console.log(this.state.friends)
             });
     }
 
     async componentDidMount() {
         this.getFriends()
     }
-
-
 
     render() {
         if (this.state.isLoading) {
@@ -59,23 +58,52 @@ class Friends extends Component {
             return (
                 <View style={styles.container}>
 
-                    <View style={pageStyle.headerContainer}>
+                    <View style={styles.headerContainer}>
                         <TouchableOpacity
-                            style={pageStyle.buttonStyle}
+                            style={styles.leftButton}
                             onPress={() => this.props.navigation.goBack()}
                         >
-                            <Text style={styles.buttonText}>Back</Text>
+                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
-                        <View style={pageStyle.pageTitleContainer}>
+
+                        <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Friends</Text>
                         </View>
+
+                        <View style={styles.rightButton}>
+                            <TouchableOpacity
+                                onPress={() => this.props.navigation.navigate('AddFriends')}
+                            >
+                                <Ionicons name={'person-add'} size={24} color={'#FFFFFF'} />
+                            </TouchableOpacity>
+                        </View>
+
                     </View>
 
-
-
-
                     <ScrollView>
-                        <Text style={{color:'white'}}>hello</Text>
+                        {this.state.friends.length == 0 && <Text style={styles.emptyMessage}>You have no friends.</Text>}
+                        {this.state.friends.length > 0 && !this.state.isLoading && (this.state.friends).map((friend) => (
+                            <TouchableOpacity
+                                key={friend.id}
+                                style={userCardStyle.userContainer}
+                            //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
+                            >
+                                <Image
+                                    style={userCardStyle.userAvatar}
+                                    source={{ uri: 'https://api.multiavatar.com/' + friend.username + '.png' }}
+                                />
+                                <View style={userCardStyle.usernameContainer}>
+                                    <Text style={userCardStyle.username}>{friend.username} </Text>
+                                </View>
+                                <TouchableOpacity
+                                    style={userCardStyle.addOrRemoveFriendButton}
+                                    onPress={() => this.sayHi()}
+                                >
+                                    <Ionicons name={'person-remove'} size={20} color={'#FFFFFF'} />
+                                </TouchableOpacity>
+
+                            </TouchableOpacity>
+                        ))}
                     </ScrollView>
                 </View>
             )

@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
 
 
 const styles = StyleSheet.create({
@@ -13,15 +13,12 @@ const styles = StyleSheet.create({
         opacity: 0.75,
         height: 2
     },
-  });
-
-
-
+  })
 
 const Divider = () => {
   return (
     <View style={styles.dividerContainer}><View style={styles.divider}></View></View>
-  );
+  )
 }
 
-export default Divider;
+export default Divider

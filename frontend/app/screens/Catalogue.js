@@ -3,6 +3,7 @@ import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert } from 
 import helpers from '../components/helpers'
 import { ScrollView } from 'react-native-gesture-handler'
 import Divider from '../components/Divider'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet')
@@ -101,14 +102,15 @@ class Catalogue extends Component {
             return (
                 <View style={styles.container}>
 
-                    <View style={pageStyle.headerContainer}>
+                    <View style={styles.headerContainer}>
                         <TouchableOpacity
-                            style={pageStyle.buttonStyle}
+                            style={styles.leftButton}
                             onPress={() => this.props.navigation.goBack()}
                         >
-                            <Text style={styles.buttonText}>Back</Text>
+                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
-                        <View style={pageStyle.pageTitleContainer}>
+                        
+                        <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
                         </View>
                     </View>
@@ -117,7 +119,7 @@ class Catalogue extends Component {
 
 
                     <ScrollView>
-                        {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are no fanfictions currently in this catalogue</Text>}
+                        {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are currently no fanfictions in this catalogue</Text>}
                         {this.state.fics.length > 0 && !this.state.isLoading && (this.state.fics).map((fic, index) => (
 
                             <View
@@ -131,7 +133,7 @@ class Catalogue extends Component {
                                         <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
                                     ))}
                                 </View>
-                                <Divider/>
+                                <Divider />
                                 {/* Summary of fic */}
                                 <View style={ficCardStyle.summaryContainer}>
                                     {/* If empty - no summary available */}

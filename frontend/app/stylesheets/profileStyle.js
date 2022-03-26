@@ -2,33 +2,6 @@
 import { StyleSheet } from 'react-native'
 
 module.exports = StyleSheet.create({
-    headerContainer: {
-        flexDirection: 'row',
-        paddingTop: 20,
-        paddingBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#FFFFFF',
-    },
-    addFriendsButton:{
-        width: '15%',
-        alignItems: 'flex-start',
-        paddingLeft: '4%',
-    },
-    settingsButton:{
-        width: '15%',
-        alignItems: 'flex-end',
-        paddingRight: '4%',
-    },
-    pageTitleContainer: {
-        width: '70%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    pageTitleText: {
-        fontSize: 20,
-        color: '#FFFFFF',
-        fontFamily: 'Roboto',
-    },
     profileContainer: {
         paddingTop: 16,
         paddingBottom: 8,
@@ -115,7 +88,8 @@ module.exports = StyleSheet.create({
         paddingLeft: '1%',
         paddingRight: '1%',
         height: 40,
-        backgroundColor: '#2F7571',
+        borderWidth: 1,
+        borderColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 5,

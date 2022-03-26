@@ -13,8 +13,10 @@ class Dashboard extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.pageTitleContainer}>
-                    <Text style={styles.pageTitleText}>Dashboard</Text>
+                 <View style={styles.headerContainer}>
+                    <View style={styles.pageTitleContainer}>
+                        <Text style={styles.pageTitleText}>Dashboard</Text>
+                    </View>
                 </View>
             </View>
         )

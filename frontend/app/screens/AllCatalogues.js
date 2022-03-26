@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import { Text, View, TouchableOpacity, Modal, TouchableWithoutFeedback, TextInput, ActivityIndicator } from 'react-native';
-import helpers from '../components/helpers';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Component } from 'react'
+import { Text, View, TouchableOpacity, Modal, TouchableWithoutFeedback, TextInput, ActivityIndicator } from 'react-native'
+import helpers from '../components/helpers'
+import { ScrollView } from 'react-native-gesture-handler'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet');
@@ -191,8 +192,10 @@ class AllCatalogues extends Component {
                     </View>
                 </Modal>
 
-                <View style={styles.pageTitleContainer}>
-                    <Text style={styles.pageTitleText}>Catalogues</Text>
+                <View style={styles.headerContainer}>
+                    <View style={styles.pageTitleContainer}>
+                        <Text style={styles.pageTitleText}>Catalogues</Text>
+                    </View>
                 </View>
 
                 <ScrollView contentContainerStyle={pageStyle.allCataloguesContainer}>
@@ -201,10 +204,10 @@ class AllCatalogues extends Component {
                             style={pageStyle.buttonStyle}
                             onPress={() => this.setState({ catalogueModalVisible: true })}
                         >
-                            <Text style={styles.buttonText}>Create new catalogue</Text>
+                            <Text style={styles.buttonText}><Ionicons name={'create-outline'} size={18} color={'#FFFFFF'} />  Create new catalogue</Text>
                         </TouchableOpacity>
                     </View>
-                    {this.state.catalogues.length == 0 && <Text style={styles.mainTextEmpty}>You have no catalogues</Text>}
+                    {this.state.catalogues.length == 0 && <Text style={styles.emptyMessage}>You have no catalogues</Text>}
                     {this.state.catalogues.length > 0 && !this.state.isLoading && (this.state.catalogues).map((catalogue) => (
                         <TouchableOpacity
                             key={catalogue.id}
@@ -213,8 +216,6 @@ class AllCatalogues extends Component {
                         >
                             {/* Title of catalogue*/}
                             <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
-
-
 
                         </TouchableOpacity>
                     ))}
