@@ -57,4 +57,21 @@ module.exports = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center'
     },
+    removeFicContainer: {
+        alignItems: 'center',
+        paddingTop: 8,
+        paddingBottom: 8,
+    },
+    removeButton: {
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#3D3D3D',
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        textAlign: 'center'
+    }
 });

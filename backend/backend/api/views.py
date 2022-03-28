@@ -11,6 +11,7 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from django.contrib.auth.models import User
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 from friendship.models import Friend, FriendshipRequest, Follow, Block
+from django.contrib.auth import authenticate
 
 import AO3
 import json
@@ -51,8 +52,6 @@ class LogoutUserAPIView(APIView):
     def get(self, request, format=None):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
-
-
 
 @api_view(('GET',))
 def searchFic(request):
@@ -459,3 +458,125 @@ def hasFriendRequests(request):
     
     data = json.dumps(data)
     return Response(data)
+
+@api_view(('POST',))
+def removeFriend(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get other user
+    body = json.loads(request.body)
+    userID = body['id']
+    otherUser = User.objects.get(id=userID)
+
+    # Remove friendship
+    Friend.objects.remove_friend(currentUser, otherUser)                        
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+def removeFic(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get ID of catalogue and fanfic
+    body = json.loads(request.body)
+    ficID = body['ficID']
+    catalogueID = body['catalogueID']
+
+    # Get catalogue
+    catalogue = Catalogue.objects.get(id=catalogueID)
+
+    # Get fic
+    fic = Fic.objects.get(workid=ficID)
+
+    # Remove fanfic from catalogue
+    catalogueFic = CatalogueFic.objects.get(catalogue=catalogue, fic=fic)
+    catalogueFic.delete()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+def deleteCatalogue(request):
+    # Get ID of catalogue and fanfic
+    body = json.loads(request.body)
+    catalogueID = body['id']
+
+    # Get catalogue
+    catalogue = Catalogue.objects.get(id=catalogueID)
+    catalogue.delete()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+
+
+@api_view(('POST',))
+def changePassword(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    body = json.loads(request.body)
+    oldPassword = body['oldPassword']
+    newPassword = body['newPassword']
+    confirmNewPassword = body['confirmNewPassword']
+
+    # Authenticate user by making sure they entered correct password
+    user = authenticate(username=user.username, password=oldPassword)
+    if user is not None:
+        # Credentials have been authenticated
+        # Check if newPassword and confirmNewPassword match
+        if newPassword == confirmNewPassword: 
+            user.set_password(newPassword)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    else:
+        # Authentication failed - wrong password
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+                          
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+
+
+@api_view(('POST',))
+def changeUsername(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    body = json.loads(request.body)
+    newUsername = body['newUsername']
+    password = body['password']
+
+    # Authenticate user by making sure they entered correct password
+    user = authenticate(username=user.username, password=password)
+    if user is not None:
+        # Credentials have been authenticated
+
+        # Check if this username is already taken
+        if User.objects.filter(username=newUsername).exists(): 
+            return Response(status=status.HTTP_409_CONFLICT)
+        
+        # If username is not taken, update username
+        else:
+            user.username = newUsername
+            user.save()
+        
+    else:
+        # Authentication failed - wrong password
+        return Response(status=status.HTTP_401_UNAUTHORIZED)                      
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)

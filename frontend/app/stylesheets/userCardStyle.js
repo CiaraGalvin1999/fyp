@@ -60,7 +60,7 @@ module.exports = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center'
     },
-    sendRequestContainer: {
+    singleButtonContainer: {
         width: '44%',
         alignItems: 'flex-end',
         paddingRight: '2%'
@@ -86,6 +86,13 @@ module.exports = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#3D3D3D',
         borderRadius: 5,
-    }
+    },
+    removeFriendButton: {
+        minWidth: '80%',
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#3D3D3D',
+        borderRadius: 5,
+    },
     
 })

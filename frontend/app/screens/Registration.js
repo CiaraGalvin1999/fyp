@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native';
+import React, { Component } from 'react'
+import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native'
+import helpers from '../components/helpers';
 
 const styles = require('../stylesheets/mainStylesheet');
 
@@ -68,10 +69,9 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Username <Text style={styles.required}>*</Text></Text></View>
                         <TextInput
                             style={styles.field}
-                            placeholder="Choose a username..."
+                            placeholder="Enter a username..."
                             placeholderTextColor='#CBCBCB'
                             autoCorrect={false}
                             autoCapitalize="none"
@@ -80,10 +80,9 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Email Address</Text></View>
                         <TextInput
                             style={styles.field}
-                            placeholder="Enter your email..."
+                            placeholder="Enter your email address..."
                             placeholderTextColor='#CBCBCB'
                             autoCorrect={false}
                             autoCapitalize="none"
@@ -92,7 +91,6 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Password <Text style={styles.required}>*</Text></Text></View>
                         <TextInput
                             style={styles.field}
                             secureTextEntry
@@ -105,24 +103,22 @@ class Registration extends Component {
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>First Name</Text></View>
                         <TextInput
                             style={styles.field}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            placeholder="Enter your first name..."
+                            placeholder="Enter first name..."
                             placeholderTextColor='#CBCBCB'
                             onChangeText={this.updateFirstName}
                         ></TextInput>
                     </View>
 
                     <View style={styles.fieldContainer}>
-                        <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Surname</Text></View>
                         <TextInput
                             style={styles.field}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            placeholder="Enter your surname..."
+                            placeholder="Enter last name..."
                             placeholderTextColor='#CBCBCB'
                             onChangeText={this.updateLastName}
                         ></TextInput>

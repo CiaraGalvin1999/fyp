@@ -24,7 +24,7 @@ class Friends extends Component {
         let token = await helpers.getToken();
 
         // GET request - requests catalogues from db for logged in user
-        fetch('http://10.0.2.2:8000/api/getFriends', {
+        fetch('http://10.0.2.2:8000/api/getFriends/', {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token,
@@ -40,6 +40,55 @@ class Friends extends Component {
             .then(data => {
                 this.setState({ friends: data, isLoading: false })
             });
+    }
+
+    async removeFriend (friend) {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/removeFriend/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': friend.id,
+                })
+            })
+
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({
+                    friends: this.state.friends.filter(function (f) {
+                        return f !== friend
+                    })
+                });
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
     async componentDidMount() {
@@ -82,28 +131,32 @@ class Friends extends Component {
 
                     <ScrollView>
                         {this.state.friends.length == 0 && <Text style={styles.emptyMessage}>You have no friends.</Text>}
-                        {this.state.friends.length > 0 && !this.state.isLoading && (this.state.friends).map((friend) => (
-                            <TouchableOpacity
-                                key={friend.id}
-                                style={userCardStyle.userContainer}
-                            //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
-                            >
-                                <Image
-                                    style={userCardStyle.userAvatar}
-                                    source={{ uri: 'https://api.multiavatar.com/' + friend.username + '.png' }}
-                                />
-                                <View style={userCardStyle.usernameContainer}>
-                                    <Text style={userCardStyle.username}>{friend.username} </Text>
-                                </View>
+                        <View style={userCardStyle.mainContainer}>
+                            {this.state.friends.length > 0 && !this.state.isLoading && (this.state.friends).map((friend) => (
                                 <TouchableOpacity
-                                    style={userCardStyle.addOrRemoveFriendButton}
-                                    onPress={() => this.sayHi()}
+                                    key={friend.id}
+                                    style={userCardStyle.userContainer}
+                                //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
                                 >
-                                    <Ionicons name={'person-remove'} size={20} color={'#FFFFFF'} />
-                                </TouchableOpacity>
+                                    <Image
+                                        style={userCardStyle.userAvatar}
+                                        source={{ uri: 'https://api.multiavatar.com/' + friend.username + '.png' }}
+                                    />
+                                    <View style={userCardStyle.usernameContainer}>
+                                        <Text style={userCardStyle.username}>{friend.username} </Text>
+                                    </View>
+                                    <View style={userCardStyle.singleButtonContainer}>
+                                        <TouchableOpacity
+                                            style={userCardStyle.removeFriendButton}
+                                            onPress={() => this.removeFriend(friend)}
+                                        >
+                                            <Text style={userCardStyle.buttonText}>Remove Friend</Text>
+                                        </TouchableOpacity>
+                                    </View>
 
-                            </TouchableOpacity>
-                        ))}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </ScrollView>
                 </View>
             )

@@ -65,11 +65,13 @@ module.exports = StyleSheet.create({
         fontFamily: 'Roboto'
     },
     field: {
-        width: '80%',
+        width: '70%',
         borderColor: '#CBCBCB',
         borderBottomWidth: 1,
         fontSize: 14,
-        color: '#FFFFFF'
+        color: '#FFFFFF',
+        margin: 16,
+        marginTop: 8,
     },
     buttonStyle: {
         minWidth: '60%',
@@ -90,11 +92,6 @@ module.exports = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    textInputTitle: {
-        color: '#FFFFFF',
-        paddingLeft: 4,
-        paddingTop: 4,
     },
     required: {
         color: '#FF6C0A',
@@ -166,6 +163,7 @@ module.exports = StyleSheet.create({
         paddingTop: 8,
         paddingLeft: 4,
         color: '#FF6C0A',
+        alignSelf: 'center'
     },
     // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
     emptyMessage: {
@@ -175,4 +173,14 @@ module.exports = StyleSheet.create({
         opacity: 0.75,
         textAlign: 'center'
     },
+    updatedSuccessfullyContainer: {
+        width: '100%',
+        alignItems: 'center'
+    },
+    updatedSuccessfullyMessage: {
+        width: '80%',
+        fontFamily: 'Roboto',
+        color: '#FFFFFF',
+        fontSize: 16,
+    }
 });

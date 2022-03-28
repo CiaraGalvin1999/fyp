@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 # Catalogue will have a title and an associated user which will be a foreign key to the default User model provided by Django
 class Catalogue(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Catalogue title must be unique for given user

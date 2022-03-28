@@ -40,7 +40,7 @@ class AllCatalogues extends Component {
             let token = await helpers.getToken();
 
             // GET request - requests catalogues
-            fetch('http://10.0.2.2:8000/api/getCatalogues', {
+            fetch('http://10.0.2.2:8000/api/getCatalogues/', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -111,7 +111,58 @@ class AllCatalogues extends Component {
             // Set loading to true when catalogue is being created 
             this.setState({ isLoading: true })
 
-            fetch('http://10.0.2.2:8000/api/createCatalogue/', {
+            let data = null
+            try {
+                const response = await fetch('http://10.0.2.2:8000/api/createCatalogue/', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Token ' + token,
+                    },
+                    body: JSON.stringify({
+                        'title': this.state.newTitle,
+                    })
+                })
+
+                // Get status
+                const statusCode = response.status
+
+                // If unauthorised, clear token and log user out
+                if (statusCode == 401) {
+                    helpers.clearToken()
+                }
+                // If success, parse data and update users
+                else if (statusCode >= 200 && statusCode < 300) {
+                    const json = await response.json()
+                    data = JSON.parse(json)
+
+                    // Modal is no longer visible, newTitle is made null, and errors are removed from modal
+                    this.setState({ catalogues: data, catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false})
+                }
+                else if (statusCode >= 400 && statusCode < 500) {
+                    console.log('Client error.')
+                }
+                else if (statusCode >= 500 && statusCode < 600) {
+                    console.log('Server error.')
+                }
+            } catch (err) {
+                console.log(err)
+            } finally {
+                this.setState({ isLoading: false })
+            }
+        }
+    }
+
+    async deleteCatalogue(catalogue) {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/deleteCatalogue/', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -119,20 +170,39 @@ class AllCatalogues extends Component {
                     'Authorization': 'Token ' + token,
                 },
                 body: JSON.stringify({
-                    'title': this.state.newTitle,
+                    'id': catalogue.id,
                 })
             })
-                .then(response => response.json())
-                // Updates list of catalogues
-                .then(data => this.setState({ catalogues: JSON.parse(data) }))
-                // Modal is no longer visible, newTitle is made null, and errors are removed from modal
-                .then(this.setState({ catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false }))
-                .then(setTimeout(() => { this.setState({ isLoading: false }) }, 1500)) // Allow catalogue to be updated before setting isLoading to false
-                .catch(function (error) {
-                    console.log("Error: " + error);
+
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({
+                    catalogues: this.state.catalogues.filter(function (c) {
+                        return c !== catalogue
+                    })
                 });
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
         }
     }
+
 
     render() {
         if (this.state.isLoading) {
@@ -164,15 +234,18 @@ class AllCatalogues extends Component {
                             <View style={styles.modalMainContent}>
                                 {this.state.titleNullError && <Text style={styles.requiredErrorMessage}>Please enter a title</Text>}
                                 {this.state.notUniqueTitleError && <Text style={styles.requiredErrorMessage}>You cannot have two catalogues with the same name</Text>}
-                                <Text style={styles.textInputTitle}>Title<Text style={styles.required}> *</Text></Text>
-                                <TextInput
-                                    style={{ color: '#FFFFFF' }}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    placeholder="Enter title..."
-                                    placeholderTextColor='#CBCBCB'
-                                    onChangeText={this.updateNewTitle}
-                                ></TextInput>
+                                <View style={styles.fieldContainer}>
+                                    <TextInput
+                                        style={{ color: '#FFFFFF' }}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        placeholder="Enter title..."
+                                        placeholderTextColor='#CBCBCB'
+                                        onChangeText={this.updateNewTitle}
+                                        maxLength={100}
+                                        multiline={true}
+                                    ></TextInput>
+                                </View>
                             </View>
                         </View>
                         <View style={styles.modalFooter}>
@@ -209,15 +282,30 @@ class AllCatalogues extends Component {
                     </View>
                     {this.state.catalogues.length == 0 && <Text style={styles.emptyMessage}>You have no catalogues</Text>}
                     {this.state.catalogues.length > 0 && !this.state.isLoading && (this.state.catalogues).map((catalogue) => (
+
                         <TouchableOpacity
                             key={catalogue.id}
                             style={pageStyle.catalogueContainer}
                             onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
                         >
                             {/* Title of catalogue*/}
-                            <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
+                            <View style={pageStyle.title}>
+                                <Text style={pageStyle.titleText}>{catalogue.title}</Text>
+                            </View>
+                            <View style={pageStyle.buttonsContainer}>
+                                <View style={pageStyle.changePageIcon}>
+                                    <Ionicons name={'chevron-forward-outline'} size={22} color={'#FFFFFF'} />
+                                </View>
+                                <TouchableOpacity
+                                    style={pageStyle.deleteCatalogueButton}
+                                    onPress={() => this.deleteCatalogue(catalogue)}
+                                >
+                                    <Ionicons name={'trash-outline'} size={22} color={'#FFFFFF'} />
+                                </TouchableOpacity>
 
+                            </View>
                         </TouchableOpacity>
+
                     ))}
                 </ScrollView>
             </View>

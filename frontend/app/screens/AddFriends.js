@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Text, View, TouchableOpacity, ActivityIndicator, TextInput, ScrollView, Image } from 'react-native'
 import helpers from '../components/helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { StackActions, NavigationActions } from '@react-navigation/native';
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/addFriendsStyle')
@@ -28,7 +27,6 @@ class AddFriends extends Component {
     }
 
     searchUser = async () => {
-
         // Gets user token
         let token = await helpers.getToken();
 
@@ -222,7 +220,7 @@ class AddFriends extends Component {
 
         let data = null
         try {
-            const response = await fetch('http://10.0.2.2:8000/api/hasFriendRequests', {
+            const response = await fetch('http://10.0.2.2:8000/api/hasFriendRequests/', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -324,7 +322,7 @@ render() {
                                 <Text style={userCardStyle.username}>{user.username} </Text>
                             </View>
 
-                            {(user.requestStatus == 'n' || user.requestStatus == 's') && <View style={userCardStyle.sendRequestContainer}>
+                            {(user.requestStatus == 'n' || user.requestStatus == 's') && <View style={userCardStyle.singleButtonContainer}>
                                 {/* If no friend request has been sent/received between these two users - create a Send Request button */}
                                 {user.requestStatus == 'n' &&
                                     <TouchableOpacity

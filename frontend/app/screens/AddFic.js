@@ -55,7 +55,6 @@ class AddFic extends Component {
                 <View style={styles.spaceTop}/>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Title</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter title..."
@@ -67,7 +66,6 @@ class AddFic extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Author</Text></View>
                     <TextInput
                         style={styles.field}
                         autoCapitalize="none"

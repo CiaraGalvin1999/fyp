@@ -36,4 +36,14 @@ urlpatterns = [
     path('sendFriendRequest/', views.sendFriendRequest, name='send_friend_request'),
     # Check if user has friend requests
     path('hasFriendRequests/', views.hasFriendRequests, name='has_friend_requests'),
+    # Remove friend
+    path('removeFriend/', views.removeFriend, name='remove_friend'),
+    # Remove fic from catalogue
+    path('removeFic/', views.removeFic, name='remove_fic'),
+    # Delete catalogue
+    path('deleteCatalogue/', views.deleteCatalogue, name='delete_catalogue'),
+    # Change password
+    path('changePassword/', views.changePassword, name='change_password'),
+    # Change username
+    path('changeUsername/', views.changeUsername, name='change_username')
 ]

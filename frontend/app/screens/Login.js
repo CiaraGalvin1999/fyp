@@ -18,7 +18,7 @@ class Login extends Component {
         }
     }
 
-    //Functions that update each state as the registration form is filled in
+    //Functions that update each state as the login form is filled in
     updateUsername = (value) => {
         this.setState({ username: value })
     }
@@ -60,7 +60,6 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Username</Text></View>
                     <TextInput
                         style={styles.field}
                         placeholder="Enter username..."
@@ -72,7 +71,6 @@ class Login extends Component {
                 </View>
 
                 <View style={styles.fieldContainer}>
-                    <View style={{ width: '80%', marginTop: 10 }}><Text style={styles.fieldTitle}>Password</Text></View>
                     <TextInput
                         style={styles.field}
                         secureTextEntry

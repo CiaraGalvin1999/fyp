@@ -65,16 +65,19 @@ class Profile extends Component {
             return (
                 <View style={styles.container}>
                     <View style={styles.headerContainer}>
-                        <TouchableOpacity 
-                        style={styles.leftButton}
-                        onPress={()=>this.props.navigation.navigate('Friends')}
+                        <TouchableOpacity
+                            style={styles.leftButton}
+                            onPress={() => this.props.navigation.navigate('Friends')}
                         >
                             <Ionicons name={'people'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Profile</Text>
                         </View>
-                        <TouchableOpacity style={styles.rightButton}>
+                        <TouchableOpacity
+                            style={styles.rightButton}
+                            onPress={() => this.props.navigation.navigate('Settings')}
+                        >
                             <Ionicons name={'settings'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
                     </View>
@@ -82,7 +85,7 @@ class Profile extends Component {
                         <View style={pageStyle.profileContainer}>
                             <Image
                                 style={pageStyle.avatar}
-                                source={{ uri: 'https://api.multiavatar.com/' + this.state.username + '.png' }}      
+                                source={{ uri: 'https://api.multiavatar.com/' + this.state.username + '.png' }}
                             />
 
                             <Text style={pageStyle.username}>@{this.state.username}</Text>
@@ -95,10 +98,10 @@ class Profile extends Component {
                                 <Text style={pageStyle.countText}>Friends{'\n'}{this.state.numFriends}</Text>
                             </View>
                         </View>
-                        {this.state.about.length > 0 &&<View style={pageStyle.aboutContainer}>
-                             <Text style={pageStyle.aboutText}>{this.state.about}</Text>
+                        {this.state.about.length > 0 && <View style={pageStyle.aboutContainer}>
+                            <Text style={pageStyle.aboutText}>{this.state.about}</Text>
                         </View>}
-                        <Divider/>
+                        <Divider />
                         <Text style={pageStyle.sectionTitle}>Recent Catalogues</Text>
                         <ScrollView horizontal={true} style={pageStyle.cataloguesContainer}>
                             {this.state.recentCatalogues.length > 0 && !this.state.isLoading && (this.state.recentCatalogues).map((catalogue) => (
@@ -109,7 +112,7 @@ class Profile extends Component {
                                         screen: 'Catalogue',
                                         params: catalogue,
                                         initial: false
-                                      })}
+                                    })}
                                 >
                                     {/* Title of catalogue*/}
                                     <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
@@ -120,12 +123,12 @@ class Profile extends Component {
                         <View style={pageStyle.buttonContainer}>
                             <TouchableOpacity
                                 style={pageStyle.buttonStyle}
-                                onPress={() => this.props.navigation.navigate('CatalogueStack', { screen: 'AllCatalogues'})}
+                                onPress={() => this.props.navigation.navigate('CatalogueStack', { screen: 'AllCatalogues' })}
                             >
                                 <Text style={styles.buttonText}>View all catalogues</Text>
                             </TouchableOpacity>
                         </View>
-                        <Divider/>
+                        <Divider />
                         <Text style={pageStyle.sectionTitle}>Recent Activity</Text>
                     </ScrollView>
                 </View>

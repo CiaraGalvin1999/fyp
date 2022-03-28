@@ -54,26 +54,42 @@ class Catalogue extends Component {
             // Gets token associated with user
             let token = await helpers.getToken();
 
-            // GET request - requests catalogues
-            fetch('http://10.0.2.2:8000/api/getCatalogue/?id=' + this.props.route.params.id, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token,
-                }
-            })
-                // Catches errors
-                .catch(function (error) {
-                    console.log("Error: " + error);
+            let data = null
+            try {
+                const response = await fetch('http://10.0.2.2:8000/api/getCatalogue/?id=' + this.props.route.params.id, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Token ' + token,
+                    }
                 })
-                // Finds json data in response
-                .then(response => response.json())
-                // Saves catalogues to state and changes isLoading boolean to false
-                .then(data => {
-                    this.setState({ fics: JSON.parse(data), isLoading: false })
-                });
+
+                // Get status
+                const statusCode = response.status
+
+                // If unauthorised, clear token and log user out
+                if (statusCode == 401) {
+                    helpers.clearToken()
+                }
+                // If success, parse data and update users
+                else if (statusCode >= 200 && statusCode < 300) {
+                    const json = await response.json()
+                    data = JSON.parse(json)
+                    this.setState({ fics: data })
+                }
+                else if (statusCode >= 400 && statusCode < 500) {
+                    console.log('Client error.')
+                }
+                else if (statusCode >= 500 && statusCode < 600) {
+                    console.log('Server error.')
+                }
+            } catch (err) {
+                console.log(err)
+            } finally {
+                this.setState({ isLoading: false })
+            }
+
+
         });
-
-
 
         // TO DO
         // This is a workaround to make it not look funky when a catalogue is navigated to from profile
@@ -88,6 +104,56 @@ class Catalogue extends Component {
     componentWillUnmount() {
         // Remove the event listener
         this.focusListener();
+    }
+
+    async removeFic(fic) {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/removeFic/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'ficID': fic.workid,
+                    'catalogueID': this.props.route.params.id
+                })
+            })
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({
+                    fics: this.state.fics.filter(function (f) {
+                        return f !== fic
+                    })
+                });
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+
     }
 
     render() {
@@ -109,7 +175,7 @@ class Catalogue extends Component {
                         >
                             <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
-                        
+
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
                         </View>
@@ -141,7 +207,17 @@ class Catalogue extends Component {
 
                                     {fic.summary != '' && <Text style={ficCardStyle.ficSummary}>{fic.summary}</Text>}
                                 </View>
+                                <Divider />
                                 <OpenFic ficID={fic.workid}></OpenFic>
+                                <View style={ficCardStyle.removeFicContainer}>
+                                    <TouchableOpacity
+                                        style={ficCardStyle.removeButton}
+                                        onPress={() => this.removeFic(fic)}
+                                    >
+                                        <Text style={ficCardStyle.buttonText}>Remove from catalogue</Text>
+
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         ))}
                     </ScrollView>
