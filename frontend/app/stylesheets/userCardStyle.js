@@ -2,82 +2,90 @@
 import { StyleSheet } from 'react-native'
 
 module.exports = StyleSheet.create({
+
+    mainContainer: {
+        padding: '2%',
+    },
     userContainer: {
-        margin: 10,
-        marginTop: 16,
+        padding: '2%',
         borderRadius: 5,
         borderColor: '#3D3D3D',
         borderWidth: 1,
         backgroundColor: '#121212',
         alignItems: 'center',
-        padding: 8,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 8,
+        marginBottom: 8,
     },
     userAvatar: {
-        width: '12%',
-        aspectRatio: 1,
+        width: '10%',
+        aspectRatio: 1
     },
     usernameContainer: {
-        width: '45%',
-        padding: 8,
+        width: '46%',
+        padding: '2%',
     },
     username:{
         color: '#FFFFFF',
         fontFamily: 'Roboto',
         fontSize: 15,
     },
-    addOrRemoveFriendButton: {
-        
-    },
     acceptDenyRequest: {
+        width: '44%',
         flexDirection: 'row',
-        alignItems: 'flex-end',
+    },
+    acceptButtonContainer: {
+        width: '50%',
+        alignItems: 'flex-start',
     },
     acceptButton: {
-        padding: 8,
-        margin: 8,
         borderWidth: 1,
         borderColor: '#2F7571',
         borderRadius: 5,
+        padding: 8,
+    },
+    denyButtonContainer: {
+        width: '50%',
+        alignItems: 'center',
     },
     denyButton: {
-        padding: 8,
-        margin: 8,
         borderWidth: 1,
         borderColor: '#3D3D3D',
         borderRadius: 5,
+        padding: 8,
     },
     buttonText: {
         color: '#FFFFFF',
         fontFamily: 'Roboto',
-        fontSize: 15,
-    }
-    /*
-    userContainer: {
-        flexDirection: 'row',
-        padding: '2.5%',
+        fontSize: 14,
+        textAlign: 'center'
     },
-    userAvatar: {
-        width: '12%',
-        aspectRatio: 1,
-    },
-    usernameContainer: {
-        width: '73%',
-        paddingLeft: 12,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-    },
-    username:{
-        color: '#FFFFFF',
-        fontFamily: 'Roboto',
-        fontSize: 16,
-    },
-    addOrRemoveFriendButton: {
-        width:'15%',
+    sendRequestContainer: {
+        width: '44%',
         alignItems: 'flex-end',
-        paddingRight: '2.5%',
-        justifyContent: 'center'
-
+        paddingRight: '2%'
+    },
+    sendRequestButton: {
+        width: '100%',
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#2F7571',
+        borderRadius: 5,
+    },
+    acceptRequestButton: {
+        width: '100%',
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#2F7571',
+        backgroundColor: '#2F7571',
+        borderRadius: 5,
+    },
+    requestSentButton: {
+        width: '100%',
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#3D3D3D',
+        borderRadius: 5,
     }
-    */
+    
 })

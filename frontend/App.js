@@ -30,12 +30,20 @@ class App extends Component {
 
   componentDidMount() {
     AsyncStorage.getItem('token').then((t) => {
-      this.setState({ token: t !== null, isLoading:false })
+      this.setState({ token: t !== null, isLoading: false })
+      console.log(t)
+    })
+  }
+
+  componentDidUpdate() {
+    AsyncStorage.getItem('token').then((t) => {
+      this.setState({ token: t !== null })
     })
   }
 
   render() {
-    const auth = false;
+    let authorised = this.state.token
+
     // Loading screen while checking if user is logged in already or not
     if (this.state.isLoading) {
       return (
@@ -45,15 +53,22 @@ class App extends Component {
       )
     }
     return (
+
       <NavigationContainer>
-        <parentStack.Navigator 
-          initialRouteName={this.state.token ? 'authNav' : 'unauthNav'} 
+        <parentStack.Navigator
+
           screenOptions={({ route, navigation }) => ({
             headerShown: false,
           })}
         >
-          <parentStack.Screen name='unauthNav' component={UnauthStackScreen}></parentStack.Screen>
-          <parentStack.Screen name='authNav' component={AuthStackScreen}></parentStack.Screen>
+
+
+          {authorised ? (
+            <parentStack.Screen name='authNav' component={AuthStackScreen}></parentStack.Screen>
+          ) : (
+            <parentStack.Screen name='unauthNav' component={UnauthStackScreen}></parentStack.Screen>
+          )}
+
         </parentStack.Navigator>
       </NavigationContainer>
     )

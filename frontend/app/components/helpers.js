@@ -19,6 +19,10 @@ const helpers = {
         } catch (error) {
             console.log("Something went wrong", error);
         }
+    },
+    
+    async clearToken() {
+        AsyncStorage.clear()
     }
 }    
 export default helpers;

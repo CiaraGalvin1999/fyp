@@ -42,7 +42,6 @@ class Login extends Component {
         })
             .then(response => response.json())
             .then(data => helpers.storeToken(data))
-            .then(this.props.navigation.navigate('authNav', {screen: 'Dashboard'}))
             .catch(function (error) {
                 console.log("Error: " + error);
             });

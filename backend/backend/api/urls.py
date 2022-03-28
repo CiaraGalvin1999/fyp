@@ -32,4 +32,8 @@ urlpatterns = [
     path('acceptFriendRequest/', views.acceptFriendRequest, name='accept_friend_request'),
     # Deny friend request
     path('denyFriendRequest/', views.denyFriendRequest, name='deny_friend_reqeust'),
+    # Send friend request
+    path('sendFriendRequest/', views.sendFriendRequest, name='send_friend_request'),
+    # Check if user has friend requests
+    path('hasFriendRequests/', views.hasFriendRequests, name='has_friend_requests'),
 ]

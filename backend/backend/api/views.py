@@ -309,36 +309,58 @@ def searchUsers(request):
     auth = request.headers.get("Authorization", None)
     token = auth[6:]
     user = Token.objects.get(key=token).user
-    currentUsername = user.username
 
     # Get username sent in request/searched for
     username = request.GET.get('username')
 
+    data = getUsersNotFriendsWith(user, username)
+    
+    data = json.dumps(data)
+    return Response(data)
+
+
+def getUsersNotFriendsWith(currentUser, username):
+    currentUsername = currentUser.username
+
     # Search for this user with partial matches
-    users = User.objects.filter(username__icontains=username) 
+    users = User.objects.filter(username__icontains=username)
 
     # Exclude current user from results if in it
     users = users.exclude(username__contains=currentUsername)
 
     # Get users friends
-    friends = Friend.objects.friends(user)
+    friends = Friend.objects.friends(currentUser)
 
     # Exclude users that current user is already friends with
     for f in friends: 
         users = users.exclude(username__contains=f.username)
 
+    # Only returns max 15 people
+    users = users[:15]
+
     # Create JSON response that contains username and ID of users in result
     data = []
 
+    # Get username, id, and whether or not a friend request already exists
     for u in users:
         username = u.username
         userID = u.id
-        user = {'username': username, 'id': userID}
+
+        # s if currentUser has sent a request
+        # r if currentUser has received a request
+        # n if request does not exist
+
+        if FriendshipRequest.objects.filter(from_user=u, to_user=currentUser).exists():
+            requestStatus = 'r'
+        elif FriendshipRequest.objects.filter(from_user=currentUser, to_user=u).exists():
+            requestStatus = 's'
+        else:
+            requestStatus = 'n'
+
+        user = {'username': username, 'id': userID, 'requestStatus': requestStatus}
         data.append(user)
 
-    data = json.dumps(data)
-    return Response(data)
-
+    return data
 
 @api_view(('GET',))
 def getFriendRequests(request):
@@ -398,8 +420,42 @@ def denyFriendRequest(request):
     userID = body['id']
     otherUser = User.objects.get(id=userID)
 
-    friend_request = FriendshipRequest.objects.get(from_user=request.user, to_user=other_user)
-    friend_request.reject()
+    friend_request = FriendshipRequest.objects.get(from_user=otherUser, to_user=currentUser)
+    friend_request.delete()
     
     # Return success response
     return Response(status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+def sendFriendRequest(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get other user
+    body = json.loads(request.body)
+    userID = body['id']
+    otherUser = User.objects.get(id=userID)
+
+    Friend.objects.add_friend(currentUser, otherUser)                             
+
+    # Return success response
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(('GET',))
+def hasFriendRequests(request):
+        # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    data = {}
+     # Get friend requests for associated user
+    if len(Friend.objects.unread_requests(user=user)) > 0:
+        data = {'hasFriendRequests': 'true'}
+    else:
+        data = {'hasFriendRequests': 'false'}
+    
+    data = json.dumps(data)
+    return Response(data)

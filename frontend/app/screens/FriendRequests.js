@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Text, View, TouchableOpacity, ActivityIndicator, ScrollView, Image } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import helpers from '../components/helpers'
-import Divider from '../components/Divider'
 
 const styles = require('../stylesheets/mainStylesheet')
 //const pageStyle = require('../stylesheets/friendRequestStyle')
@@ -25,33 +24,105 @@ class FriendRequests extends Component {
     }
 
     getFriendRequests = async () => {
-        // Gets token associated with user
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
         let token = await helpers.getToken();
 
-        // GET request - requests catalogues
-        fetch('http://10.0.2.2:8000/api/getFriendRequests', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            // Catches errors
-            .catch(function (error) {
-                console.log("Error: " + error);
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/getFriendRequests', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            // Finds json data in response
-            .then(response => response.json())
-            // Saves catalogues to state and changes isLoading boolean to false
-            .then(data => {
-                this.setState({ friendRequests: JSON.parse(data), isLoading: false })
-            });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ friendRequests: data })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
-    acceptFriendRequest = async (id) => {
-        // Gets user token
-        let token = await helpers.getToken()
+    acceptFriendRequest = async (request) => {
+            // Set isLoading to true
+        this.setState({ isLoading: true })
 
-        fetch('http://10.0.2.2:8000/api/acceptFriendRequest/', {
+        // Gets user token
+        let token = await helpers.getToken();
+
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/acceptFriendRequest/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': request.id,
+                })
+            })
+            
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({friendRequests: this.state.friendRequests.filter(function(r) { 
+                    return r !== request
+                })});
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+    denyFriendRequest = async (request) => {
+        // Set isLoading to true
+    this.setState({ isLoading: true })
+
+    // Gets user token
+    let token = await helpers.getToken();
+
+    let data = null
+    try {
+        const response = await fetch('http://10.0.2.2:8000/api/denyFriendRequest/', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -59,14 +130,35 @@ class FriendRequests extends Component {
                 'Authorization': 'Token ' + token,
             },
             body: JSON.stringify({
-                'id': id,
+                'id': request.id,
             })
         })
+        
+        // Get status
+        const statusCode = response.status
 
-            .catch(function (error) {
-                console.log("Error: " + error);
-            });
+        // If unauthorised, clear token and log user out
+        if (statusCode == 401) {
+            helpers.clearToken()
+        }
+        // If success, parse data and update users
+        else if (statusCode >= 200 && statusCode < 300) {
+            this.setState({friendRequests: this.state.friendRequests.filter(function(r) { 
+                return r !== request
+            })});
+        }
+        else if (statusCode >= 400 && statusCode < 500) {
+            console.log('Client error.')
+        }
+        else if (statusCode >= 500 && statusCode < 600) {
+            console.log('Server error.')
+        }
+    } catch (err) {
+        console.log(err)
+    } finally {
+        this.setState({ isLoading: false })
     }
+}
 
     render() {
         if (this.state.isLoading) {
@@ -113,18 +205,22 @@ class FriendRequests extends Component {
                                     </View>
 
                                     <View style={userCardStyle.acceptDenyRequest}>
+                                        <View style={userCardStyle.acceptButtonContainer}>
                                         <TouchableOpacity
                                             style={userCardStyle.acceptButton}
-                                            onPress={() => this.acceptFriendRequest(request.id)}
+                                            onPress={() => this.acceptFriendRequest(request)}
                                         >
                                             <Text style={userCardStyle.buttonText}>Accept</Text>
                                         </TouchableOpacity>
+                                        </View>
+                                        <View style={userCardStyle.denyButtonContainer}>
                                         <TouchableOpacity
                                             style={userCardStyle.denyButton}
-                                        //onPress={}
+                                            onPress={() => this.denyFriendRequest(request)}
                                         >
                                             <Text style={userCardStyle.buttonText}>Delete</Text>
                                         </TouchableOpacity>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
 

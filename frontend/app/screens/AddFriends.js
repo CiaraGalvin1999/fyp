@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, View, TouchableOpacity, ActivityIndicator, TextInput, ScrollView, Image } from 'react-native'
 import helpers from '../components/helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { StackActions, NavigationActions } from '@react-navigation/native';
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/addFriendsStyle')
@@ -18,6 +19,7 @@ class AddFriends extends Component {
             hasSearched: false,
             hasFriendRequests: false,
             username: '',
+            isLoading: false,
         }
     }
 
@@ -26,56 +28,266 @@ class AddFriends extends Component {
     }
 
     searchUser = async () => {
+
+        // Gets user token
         let token = await helpers.getToken();
 
-        // GET request - requests catalogues
-        fetch('http://10.0.2.2:8000/api/searchUsers/?username=' + this.state.username, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            // Catches errors
-            .catch(function (error) {
-                console.log("Error: " + error);
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/searchUsers/?username=' + this.state.username, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            // Finds json data in response
-            .then(response => response.json())
-            // Saves users in result as state
-            .then(data => {
-                this.setState({ users: JSON.parse(data), hasSearched: true })
-            });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ users: data, hasSearched: true })
+
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+
+
     }
 
+    // Send friend request to another user
+    sendFriendRequest = async (user, index) => {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
 
-    render() {
-        return (
-            <View style={styles.container}>
+        // Gets user token
+        let token = await helpers.getToken();
 
-                {/* HEADER - BACK BUTTON, PAGE TITLE, FRIEND REQUESTS BUTTON */}
-                <View style={styles.headerContainer}>
-                    <TouchableOpacity
-                        style={styles.leftButton}
-                        onPress={() => this.props.navigation.goBack()}
-                    >
-                        <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
-                    </TouchableOpacity>
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/sendFriendRequest/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': user.id,
+                })
+            })
 
-                    <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
-                        <Text style={styles.pageTitleText}>Add Friends</Text>
-                    </View>
+            // Get status
+            const statusCode = response.status
 
-                    <View style={styles.rightButton}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate('FriendRequests')}
-                        >
-                            {!this.state.hasFriendRequests && <Ionicons name={'mail-outline'} size={24} color={'#FFFFFF'} />}
-                            {this.state.hasFriendRequests && <Ionicons name={'mail-unread-outline'} size={24} color={'#FFFFFF'} />}
-                        </TouchableOpacity>
-                    </View>
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                user.requestStatus = 's'
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+    acceptFriendRequest = async (request) => {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/acceptFriendRequest/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': request.id,
+                })
+            })
+
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({
+                    users: this.state.users.filter(function (r) {
+                        return r !== request
+                    })
+                });
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+    denyFriendRequest = async (request) => {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/denyFriendRequest/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': request.id,
+                })
+            })
+
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                request.requestStatus = 'n'
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+    async componentDidMount() {
+        this.checkHasFriendRequests()
+    }
+
+    async checkHasFriendRequests() {
+        // Set isLoading to true
+        this.setState({ isLoading: true })
+
+        // Gets user token
+        let token = await helpers.getToken();
+
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/hasFriendRequests', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
+            })
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                if(data.hasFriendRequests == 'true') {
+                    this.setState({ hasFriendRequests: true })
+                }
+                else this.setState({ hasFriendRequests: false })
+               
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+render() {
+    return (
+        <View style={styles.container}>
+
+            {/* HEADER - BACK BUTTON, PAGE TITLE, FRIEND REQUESTS BUTTON */}
+            <View style={styles.headerContainer}>
+                <TouchableOpacity
+                    style={styles.leftButton}
+                    onPress={() => this.props.navigation.goBack()}
+                >
+                    <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                </TouchableOpacity>
+
+                <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
+                    <Text style={styles.pageTitleText}>Add Friends</Text>
                 </View>
 
-                {/* MAIN CONTENT - SEARCH FUNCTIONALITY TO FIND USERS */}
+                <View style={styles.rightButton}>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate('FriendRequests')}
+                    >
+                        {!this.state.hasFriendRequests && <Ionicons name={'mail-outline'} size={24} color={'#FFFFFF'} />}
+                        {this.state.hasFriendRequests && <Ionicons name={'mail-unread-outline'} size={24} color={'#FFFFFF'} />}
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            {/* MAIN CONTENT - SEARCH FUNCTIONALITY TO FIND USERS */}
+            <ScrollView>
                 <View style={styles.spaceTop} />
                 <View style={styles.fieldContainer}>
                     <TextInput
@@ -95,10 +307,9 @@ class AddFriends extends Component {
 
                 </View>
 
-
                 {/* RESULTS */}
-                <ScrollView>
-                    {this.state.users.length == 0 && this.state.hasSearched && <Text style={styles.emptyMessage}>No results</Text>}
+                {this.state.users.length == 0 && this.state.hasSearched && <Text style={styles.emptyMessage}>No results</Text>}
+                <View style={userCardStyle.mainContainer}>
                     {this.state.users.length > 0 && this.state.hasSearched && (this.state.users).map((user) => (
                         <TouchableOpacity
                             key={user.id}
@@ -113,19 +324,49 @@ class AddFriends extends Component {
                                 <Text style={userCardStyle.username}>{user.username} </Text>
                             </View>
 
-                            <TouchableOpacity
-                                style={userCardStyle.addOrRemoveFriendButton}
-                                onPress={() => this.sayHi()}
-                            >
-                                <Ionicons name={'person-add'} size={20} color={'#FFFFFF'} />
-                            </TouchableOpacity>
+                            {(user.requestStatus == 'n' || user.requestStatus == 's') && <View style={userCardStyle.sendRequestContainer}>
+                                {/* If no friend request has been sent/received between these two users - create a Send Request button */}
+                                {user.requestStatus == 'n' &&
+                                    <TouchableOpacity
+                                        style={userCardStyle.sendRequestButton}
+                                        onPress={() => this.sendFriendRequest(user)}
+                                    >
+                                        <Text style={userCardStyle.buttonText}>Send Request</Text>
+
+                                    </TouchableOpacity>}
+                                {user.requestStatus == 's' &&
+                                    <View style={userCardStyle.requestSentButton}>
+                                        <Text style={userCardStyle.buttonText}>Request Sent</Text>
+                                    </View>}
+
+                            </View>}
+                            {user.requestStatus == 'r' &&
+                                <View style={userCardStyle.acceptDenyRequest}>
+                                    <View style={userCardStyle.acceptButtonContainer}>
+                                        <TouchableOpacity
+                                            style={userCardStyle.acceptButton}
+                                            onPress={() => this.acceptFriendRequest(user)}
+                                        >
+                                            <Text style={userCardStyle.buttonText}>Accept</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={userCardStyle.denyButtonContainer}>
+                                        <TouchableOpacity
+                                            style={userCardStyle.denyButton}
+                                            onPress={() => this.denyFriendRequest(user)}
+                                        >
+                                            <Text style={userCardStyle.buttonText}>Delete</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>}
                         </TouchableOpacity>
                     ))}
-                </ScrollView>
+                </View>
+            </ScrollView>
 
-            </View>
-        )
-    }
+        </View>
+    )
+}
 }
 
 export default AddFriends
