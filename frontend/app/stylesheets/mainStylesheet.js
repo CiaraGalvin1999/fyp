@@ -161,9 +161,10 @@ module.exports = StyleSheet.create({
     },
     requiredErrorMessage: {
         paddingTop: 8,
-        paddingLeft: 4,
+        width: '80%',
         color: '#FF6C0A',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        textAlign: 'center',
     },
     // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
     emptyMessage: {

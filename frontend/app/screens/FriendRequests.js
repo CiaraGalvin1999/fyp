@@ -66,7 +66,7 @@ class FriendRequests extends Component {
     }
 
     acceptFriendRequest = async (request) => {
-            // Set isLoading to true
+        // Set isLoading to true
         this.setState({ isLoading: true })
 
         // Gets user token
@@ -85,7 +85,7 @@ class FriendRequests extends Component {
                     'id': request.id,
                 })
             })
-            
+
 
             // Get status
             const statusCode = response.status
@@ -96,9 +96,11 @@ class FriendRequests extends Component {
             }
             // If success, parse data and update users
             else if (statusCode >= 200 && statusCode < 300) {
-                this.setState({friendRequests: this.state.friendRequests.filter(function(r) { 
-                    return r !== request
-                })});
+                this.setState({
+                    friendRequests: this.state.friendRequests.filter(function (r) {
+                        return r !== request
+                    })
+                });
             }
             else if (statusCode >= 400 && statusCode < 500) {
                 console.log('Client error.')
@@ -115,50 +117,52 @@ class FriendRequests extends Component {
 
     denyFriendRequest = async (request) => {
         // Set isLoading to true
-    this.setState({ isLoading: true })
+        this.setState({ isLoading: true })
 
-    // Gets user token
-    let token = await helpers.getToken();
+        // Gets user token
+        let token = await helpers.getToken();
 
-    let data = null
-    try {
-        const response = await fetch('http://10.0.2.2:8000/api/denyFriendRequest/', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Token ' + token,
-            },
-            body: JSON.stringify({
-                'id': request.id,
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/denyFriendRequest/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'id': request.id,
+                })
             })
-        })
-        
-        // Get status
-        const statusCode = response.status
 
-        // If unauthorised, clear token and log user out
-        if (statusCode == 401) {
-            helpers.clearToken()
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({
+                    friendRequests: this.state.friendRequests.filter(function (r) {
+                        return r !== request
+                    })
+                });
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
         }
-        // If success, parse data and update users
-        else if (statusCode >= 200 && statusCode < 300) {
-            this.setState({friendRequests: this.state.friendRequests.filter(function(r) { 
-                return r !== request
-            })});
-        }
-        else if (statusCode >= 400 && statusCode < 500) {
-            console.log('Client error.')
-        }
-        else if (statusCode >= 500 && statusCode < 600) {
-            console.log('Server error.')
-        }
-    } catch (err) {
-        console.log(err)
-    } finally {
-        this.setState({ isLoading: false })
     }
-}
 
     render() {
         if (this.state.isLoading) {
@@ -206,20 +210,20 @@ class FriendRequests extends Component {
 
                                     <View style={userCardStyle.acceptDenyRequest}>
                                         <View style={userCardStyle.acceptButtonContainer}>
-                                        <TouchableOpacity
-                                            style={userCardStyle.acceptButton}
-                                            onPress={() => this.acceptFriendRequest(request)}
-                                        >
-                                            <Text style={userCardStyle.buttonText}>Accept</Text>
-                                        </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={userCardStyle.acceptButton}
+                                                onPress={() => this.acceptFriendRequest(request)}
+                                            >
+                                                <Text style={userCardStyle.buttonText}>Accept</Text>
+                                            </TouchableOpacity>
                                         </View>
                                         <View style={userCardStyle.denyButtonContainer}>
-                                        <TouchableOpacity
-                                            style={userCardStyle.denyButton}
-                                            onPress={() => this.denyFriendRequest(request)}
-                                        >
-                                            <Text style={userCardStyle.buttonText}>Delete</Text>
-                                        </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={userCardStyle.denyButton}
+                                                onPress={() => this.denyFriendRequest(request)}
+                                            >
+                                                <Text style={userCardStyle.buttonText}>Delete</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                 </TouchableOpacity>

@@ -19,7 +19,7 @@ const ProfileStackScreen = () => (
     <ProfileStack.Navigator initialRouteName={Profile} screenOptions={() => ({
         headerShown: false,
       })}>
-        <ProfileStack.Screen name='Profile' component={Profile}/>
+        <ProfileStack.Screen name='Profile' component={Profile} initialParams={{ username: '' }}/>
         <ProfileStack.Screen name='Friends' component={Friends}/>
         <ProfileStack.Screen name='AddFriends' component={AddFriends}/>
         <ProfileStack.Screen name='FriendRequests' component={FriendRequests}/>

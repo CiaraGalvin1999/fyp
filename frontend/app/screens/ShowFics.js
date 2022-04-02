@@ -33,23 +33,39 @@ class ShowFics extends Component {
         // Gets token associated with user
         let token = await helpers.getToken();
 
-        // GET request - requests catalogues from db for logged in user
-        fetch('http://10.0.2.2:8000/api/getCatalogues', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            // Catches errors
-            .catch(function (error) {
-                console.log("Error: " + error);
+        try {
+            // GET request - requests catalogues from db for logged in user
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            // Finds json data in response
-            .then(response => response.json())
-            // Saves catalogues to state and changes isLoading boolean to false
-            .then(data => {
-                this.setState({ catalogues: JSON.parse(data), isLoading: false })
-            });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ catalogues: data })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
 
@@ -74,30 +90,51 @@ class ShowFics extends Component {
         authors = this.state.selectedFic.authors
         summary = this.state.selectedFic.summary
 
-        fetch('http://10.0.2.2:8000/api/addFic/', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Token ' + token,
-            },
-            body: JSON.stringify({
-                'workid': workid,
-                'title': title,
-                'summary': summary,
-                'authors': authors,
-                'catalogueID': catalogueID,
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/addFic/', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + token,
+                },
+                body: JSON.stringify({
+                    'workid': workid,
+                    'title': title,
+                    'summary': summary,
+                    'authors': authors,
+                    'catalogueID': catalogueID,
+                })
             })
-        })
-            .then(this.setState({ selectedFic: null, selectCatalogueModalVisible: false }))
-            .catch(function (error) {
-                console.log("Error: " + error);
-            });
+
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                this.setState({ selectedFic: null, selectCatalogueModalVisible: false })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
     render() {
         // Fics that are sent from previous screen - i.e., AddFic
-        results = JSON.parse(this.props.route.params)
+        results = this.props.route.params
 
         return (
             <View style={styles.container}>

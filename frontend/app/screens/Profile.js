@@ -20,36 +20,62 @@ class Profile extends Component {
             numCatalogues: 0,
             numFriends: 0,
             about: '',
-            recentCatalogues: []
+            recentCatalogues: [],
+            currentUser: true,
         }
     }
 
-    async getUserInfo() {
+    async getUserInfo(username) {
+        console.log('get user info')
+        console.log(username)
         // Gets token associated with user
         let token = await helpers.getToken();
 
-        // GET request - requests catalogues from db for logged in user
-        fetch('http://10.0.2.2:8000/api/getUserInfo', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            // Catches errors
-            .catch(function (error) {
-                console.log("Error: " + error);
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?username=' + username, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            // Finds json data in response
-            .then(response => response.json())
-            // Saves catalogues to state and changes isLoading boolean to false
-            .then(data => JSON.parse(data))
-            .then(data => {
-                this.setState({ username: data.username, numCatalogues: data.numCatalogues, numFriends: data.numFriends, recentCatalogues: data.recentCatalogues, isLoading: false })
-            });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ username: data.username, 
+                                numCatalogues: data.numCatalogues,
+                                numFriends: data.numFriends,
+                                recentCatalogues: data.recentCatalogues 
+                            })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
     async componentDidMount() {
-        this.getUserInfo()
+        // Check if rendering current user or someone elses profile
+        username = this.props.route.params.username
+        if(username.length == 0) this.setState({ currentUser: true })
+        
+        // Get info about user to be shown on profile
+        this.getUserInfo(username)
     }
 
 

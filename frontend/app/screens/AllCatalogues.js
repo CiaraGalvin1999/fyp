@@ -31,31 +31,51 @@ class AllCatalogues extends Component {
         }
     }
 
-    // Fetches list of catalogues associated with the user when the screen is first opened
-    async componentDidMount() {
-        // Add event listener so that catalogues are retrieved each time screen is focused
-        const { navigation } = this.props;
-        this.focusListener = navigation.addListener("focus", async () => {
-            // Gets token associated with user
-            let token = await helpers.getToken();
+    getCatalogues = async () => {
+        // Gets token associated with user
+        let token = await helpers.getToken();
 
-            // GET request - requests catalogues
-            fetch('http://10.0.2.2:8000/api/getCatalogues/', {
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues/', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
                 }
             })
-                // Catches errors
-                .catch(function (error) {
-                    console.log("Error: " + error);
-                })
-                // Finds json data in response
-                .then(response => response.json())
-                // Saves catalogues to state and changes isLoading boolean to false
-                .then(data => {
-                    this.setState({ catalogues: JSON.parse(data), isLoading: false })
-                });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ catalogues: data })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
+    // Fetches list of catalogues associated with the user when the screen is first opened
+    async componentDidMount() {
+        // Add event listener so that catalogues are retrieved each time screen is focused
+        const { navigation } = this.props;
+        this.focusListener = navigation.addListener("focus", async () => {
+            this.getCatalogues()
         });
     }
 

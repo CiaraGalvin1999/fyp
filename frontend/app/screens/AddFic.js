@@ -27,20 +27,38 @@ class AddFic extends Component {
     //TODO: FINISH
     searchFics = async () => {
         let token = await helpers.getToken();
-
-        fetch('http://10.0.2.2:8000/api/searchFic/?title=' + this.state.title + '&author=' + this.state.author, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            .catch(function (error) {
-                console.log("Error: " + error);
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/searchFic/?title=' + this.state.title + '&author=' + this.state.author, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            .then(response => response.json())
-            .then(data => {
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
                 this.props.navigation.navigate('ShowFics', data)
-            });
+                
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
 
@@ -52,7 +70,7 @@ class AddFic extends Component {
                         <Text style={styles.pageTitleText}>Add Fanfiction</Text>
                     </View>
                 </View>
-                <View style={styles.spaceTop}/>
+                <View style={styles.spaceTop} />
 
                 <View style={styles.fieldContainer}>
                     <TextInput

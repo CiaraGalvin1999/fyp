@@ -25,25 +25,40 @@ class CreateUserAPIView(CreateAPIView):
         # Can put checks here
         # request.data.password etc...
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        body = json.loads(request.body)
+        username = body['username']
+        email = body['email']
 
-        # Calls default serializer save function which calls custom create function
-        # Serializer source code - https://stackoverflow.com/questions/53319230/what-is-the-difference-between-the-create-and-perform-create-methods-in-django-r
-        # Example of how it calls my create function - https://github.com/encode/django-rest-framework/blob/a53e523f939332189b4ba8db7f99758b7d63e59b/rest_framework/serializers.py#L211
-        self.perform_create(serializer)
+        # Check if username is already taken
+        if User.objects.filter(username=username).exists() & User.objects.filter(email=email).exists(): 
+            return Response('Sorry, both the username and email you have entered have already been taken.', status=status.HTTP_409_CONFLICT)
 
-        headers = self.get_success_headers(serializer.data)
+        elif User.objects.filter(username=username).exists():
+            return Response('Sorry, this username has already been taken.', status=status.HTTP_409_CONFLICT)
+
+        elif User.objects.filter(email=email).exists():
+            return Response('Sorry, this email has already been used to create an account.', status=status.HTTP_409_CONFLICT)
         
-        #Token is created - This will be used to authorize the user in the future
-        token = Token.objects.create(user=serializer.instance)
-        token_data = {"token": token.key}
-        
-        return Response(
-            {**serializer.data, **token_data},
-            status=status.HTTP_201_CREATED,
-            headers=headers
-        )
+        else:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            # Calls default serializer save function which calls custom create function
+            # Serializer source code - https://stackoverflow.com/questions/53319230/what-is-the-difference-between-the-create-and-perform-create-methods-in-django-r
+            # Example of how it calls my create function - https://github.com/encode/django-rest-framework/blob/a53e523f939332189b4ba8db7f99758b7d63e59b/rest_framework/serializers.py#L211
+            self.perform_create(serializer)
+
+            headers = self.get_success_headers(serializer.data)
+            
+            #Token is created - This will be used to authorize the user in the future
+            token = Token.objects.create(user=serializer.instance)
+            token_data = {"token": token.key}
+            
+            return Response(
+                {**serializer.data, **token_data},
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
 
 #Logout deletes the previously created authorization token
 class LogoutUserAPIView(APIView):
@@ -252,10 +267,18 @@ def createCatalogue(request):
 
 @api_view(('GET',))
 def getUserInfo(request):
-    # Get token and associated user
-    auth = request.headers.get("Authorization", None)
-    token = auth[6:]
-    user = Token.objects.get(key=token).user
+    # Get username sent in request
+    username = request.GET.get('username')
+
+    # If it's not empty, then fine user with associated username
+    if len(username) > 0:
+        user = User.objects.get(username=username)
+
+    # Otherwise get info of logged in user (username sent in request will be empty)
+    else:
+        auth = request.headers.get("Authorization", None)
+        token = auth[6:]
+        user = Token.objects.get(key=token).user
 
     # Get number of catalogues associated with user
     catalogues = Catalogue.objects.filter(user=user).order_by('-id')

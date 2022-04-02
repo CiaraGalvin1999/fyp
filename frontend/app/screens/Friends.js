@@ -19,30 +19,46 @@ class Friends extends Component {
         }
     }
 
-    async getFriends() {
+    getFriends = async () => {
         // Gets token associated with user
         let token = await helpers.getToken();
 
-        // GET request - requests catalogues from db for logged in user
-        fetch('http://10.0.2.2:8000/api/getFriends/', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Token ' + token,
-            }
-        })
-            // Catches errors
-            .catch(function (error) {
-                console.log("Error: " + error);
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/getFriends/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
             })
-            // Finds json data in response
-            .then(response => response.json())
-            .then(data => JSON.parse(data))
-            .then(data => {
-                this.setState({ friends: data, isLoading: false })
-            });
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ friends: data })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
     }
 
-    async removeFriend (friend) {
+    async removeFriend(friend) {
         // Set isLoading to true
         this.setState({ isLoading: true })
 
@@ -136,7 +152,7 @@ class Friends extends Component {
                                 <TouchableOpacity
                                     key={friend.id}
                                     style={userCardStyle.userContainer}
-                                //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
+                                    onPress={() => this.props.navigation.navigate('Profile', friend.username)}
                                 >
                                     <Image
                                         style={userCardStyle.userAvatar}

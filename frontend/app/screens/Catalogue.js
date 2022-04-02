@@ -46,49 +46,51 @@ class Catalogue extends Component {
         }
     }
 
+    getCatalogue = async () => {
+        // Gets token associated with user
+        let token = await helpers.getToken()
+
+        let data = null
+        try {
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogue/?id=' + this.props.route.params.id, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                }
+            })
+
+            // Get status
+            const statusCode = response.status
+
+            // If unauthorised, clear token and log user out
+            if (statusCode == 401) {
+                helpers.clearToken()
+            }
+            // If success, parse data and update users
+            else if (statusCode >= 200 && statusCode < 300) {
+                const json = await response.json()
+                data = JSON.parse(json)
+                this.setState({ fics: data })
+            }
+            else if (statusCode >= 400 && statusCode < 500) {
+                console.log('Client error.')
+            }
+            else if (statusCode >= 500 && statusCode < 600) {
+                console.log('Server error.')
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            this.setState({ isLoading: false })
+        }
+    }
+
     // Fetches list of catalogues associated with the user when the screen is first opened
     async componentDidMount() {
         // Add event listener so that catalogues are retrieved each time screen is focused
         const { navigation } = this.props;
         this.focusListener = navigation.addListener("focus", async () => {
-            // Gets token associated with user
-            let token = await helpers.getToken();
-
-            let data = null
-            try {
-                const response = await fetch('http://10.0.2.2:8000/api/getCatalogue/?id=' + this.props.route.params.id, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Token ' + token,
-                    }
-                })
-
-                // Get status
-                const statusCode = response.status
-
-                // If unauthorised, clear token and log user out
-                if (statusCode == 401) {
-                    helpers.clearToken()
-                }
-                // If success, parse data and update users
-                else if (statusCode >= 200 && statusCode < 300) {
-                    const json = await response.json()
-                    data = JSON.parse(json)
-                    this.setState({ fics: data })
-                }
-                else if (statusCode >= 400 && statusCode < 500) {
-                    console.log('Client error.')
-                }
-                else if (statusCode >= 500 && statusCode < 600) {
-                    console.log('Server error.')
-                }
-            } catch (err) {
-                console.log(err)
-            } finally {
-                this.setState({ isLoading: false })
-            }
-
-
+            this.getCatalogue()
         });
 
         // TO DO
