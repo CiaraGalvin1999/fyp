@@ -52,8 +52,8 @@ module.exports = StyleSheet.create({
         justifyContent: 'center',
     },
     logo: {
-        width: 180,
-        height: 180,
+        width: 160,
+        height: 160,
         alignSelf: 'center',
     },
     fieldContainer: {

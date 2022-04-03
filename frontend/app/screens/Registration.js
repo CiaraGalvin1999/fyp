@@ -92,7 +92,7 @@ class Registration extends Component {
                 <ScrollView style={{flex: 1}}>
                     <View style={styles.spaceTop} />
                     <View style={styles.logoContainer}>
-                        <Image style={styles.logo} source={require('../assets/logo_colour_transparent.png')} />
+                        <Image style={styles.logo} source={require('../assets/logo.png')} />
                     </View>
 
                     {this.state.errorMessage.length > 0 && <Text style={styles.requiredErrorMessage}>{this.state.errorMessage}</Text>}

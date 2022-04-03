@@ -78,7 +78,7 @@ render() {
             <View style={styles.spaceTop} />
 
             <View styles={styles.logoContainer}>
-                <Image style={styles.logo} source={require('../assets/logo_colour_transparent.png')} />
+                <Image style={styles.logo} source={require('../assets/logo.png')} />
             </View>
 
             {this.state.incorrectDetails && <Text style={styles.requiredErrorMessage}>Sorry, you entered incorrect login details. Please try again.</Text>}
