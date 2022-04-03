@@ -10,6 +10,7 @@ import FriendRequests from '../screens/FriendRequests'
 import Settings from '../screens/Settings'
 import ChangePassword from '../screens/ChangePassword'
 import ChangeUsername from '../screens/ChangeUsername'
+import OtherUserProfile from '../screens/OtherUserProfile'
 
 // Stack of screens for when user is not authorised i.e., not logged in
 // Will contain login and registration screens
@@ -26,6 +27,7 @@ const ProfileStackScreen = () => (
         <ProfileStack.Screen name='Settings' component={Settings}/>
         <ProfileStack.Screen name='ChangeUsername' component={ChangeUsername}/>
         <ProfileStack.Screen name='ChangePassword' component={ChangePassword}/>
+        <ProfileStack.Screen name='OtherUserProfile' component={OtherUserProfile}/>
     </ProfileStack.Navigator>
 );
 

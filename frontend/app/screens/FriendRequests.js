@@ -198,7 +198,7 @@ class FriendRequests extends Component {
                                 <TouchableOpacity
                                     key={request.id}
                                     style={userCardStyle.userContainer}
-                                //onPress={}    
+                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', {username: request.username})}    
                                 >
                                     <Image
                                         style={userCardStyle.userAvatar}

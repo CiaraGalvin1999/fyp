@@ -7,7 +7,7 @@ import Divider from '../components/Divider';
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/profileStyle')
 
-class Profile extends Component {
+class OtherUserProfile extends Component {
     //Constructor
     //States are set here
     constructor() {
@@ -27,8 +27,8 @@ class Profile extends Component {
         // Gets token associated with user
         let token = await helpers.getToken();
 
-        // null as it is the profile of the current user
-        username = ''
+        username = this.props.route.params.username
+
         try {
             const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?username=' + username, {
                 method: 'GET',
@@ -87,19 +87,13 @@ class Profile extends Component {
                     <View style={styles.headerContainer}>
                         <TouchableOpacity
                             style={styles.leftButton}
-                            onPress={() => this.props.navigation.navigate('Friends')}
+                            onPress={() => this.props.navigation.goBack()}
                         >
-                            <Ionicons name={'people'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
                         </TouchableOpacity>
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Profile</Text>
                         </View>
-                        <TouchableOpacity
-                            style={styles.rightButton}
-                            onPress={() => this.props.navigation.navigate('Settings')}
-                        >
-                            <Ionicons name={'settings'} size={24} color={'#FFFFFF'} />
-                        </TouchableOpacity>
                     </View>
                     <ScrollView>
                         <View style={pageStyle.profileContainer}>
@@ -119,7 +113,7 @@ class Profile extends Component {
                             </View>
                         </View>
 
-                        
+
                         {/* ABOUT SECTION IF I EVER WANT IT - PUT ABOUT BACK IN STATE */}
                         {/*this.state.about.length > 0 && <View style={pageStyle.aboutContainer}>
                             <Text style={pageStyle.aboutText}>{this.state.about}</Text>
@@ -161,4 +155,4 @@ class Profile extends Component {
     }
 }
 
-export default Profile
+export default OtherUserProfile

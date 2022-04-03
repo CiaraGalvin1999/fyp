@@ -152,7 +152,7 @@ class Friends extends Component {
                                 <TouchableOpacity
                                     key={friend.id}
                                     style={userCardStyle.userContainer}
-                                    onPress={() => this.props.navigation.navigate('Profile', friend.username)}
+                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', { username: friend.username })}
                                 >
                                     <Image
                                         style={userCardStyle.userAvatar}

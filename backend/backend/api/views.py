@@ -269,7 +269,7 @@ def createCatalogue(request):
 def getUserInfo(request):
     # Get username sent in request
     username = request.GET.get('username')
-
+    
     # If it's not empty, then fine user with associated username
     if len(username) > 0:
         user = User.objects.get(username=username)

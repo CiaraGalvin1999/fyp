@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useReducer } from 'react'
 import { Text, View, TouchableOpacity, ActivityIndicator, TextInput, ScrollView, Image } from 'react-native'
 import helpers from '../components/helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -312,7 +312,7 @@ render() {
                         <TouchableOpacity
                             key={user.id}
                             style={userCardStyle.userContainer}
-                        //onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
+                            onPress={() => this.props.navigation.navigate('OtherUserProfile', {username: user.username})}
                         >
                             <Image
                                 style={userCardStyle.userAvatar}
