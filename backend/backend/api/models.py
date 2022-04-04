@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 # Create your models here.
 
@@ -7,6 +8,7 @@ from django.contrib.auth.models import User
 class Catalogue(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     # Catalogue title must be unique for given user
     class Meta:
@@ -39,6 +41,7 @@ class FicAuthor(models.Model):
 class CatalogueFic(models.Model):
     catalogue = models.ForeignKey(Catalogue, on_delete=models.CASCADE)
     fic = models.ForeignKey(Fic, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     # Ensures that catalogue doesn't have same fic twice
     class Meta:

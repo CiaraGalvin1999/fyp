@@ -29,13 +29,13 @@ class ShowFics extends Component {
         }
     }
 
-    async getCatalogues() {
+    getCatalogues = async () => {
         // Gets token associated with user
         let token = await helpers.getToken();
 
+        let data = null
         try {
-            // GET request - requests catalogues from db for logged in user
-            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues', {
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues/?userID=0', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
