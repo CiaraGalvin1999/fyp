@@ -35,9 +35,18 @@ module.exports = StyleSheet.create({
         width: '70%',
     },
     pageTitleText: {
-        fontSize: 20,
+        fontSize: 18,
         color: '#FFFFFF',
         fontFamily: 'Roboto',
+        textAlign: 'center'
+    },
+    pageSubtitleText: {
+        fontSize: 16,
+        color: '#FFFFFF',
+        fontFamily: 'Roboto',
+        textAlign: 'center',
+        opacity: 0.75,
+        fontStyle: 'italic',
     },
     loadingView: {
         flex: 1,

@@ -31,7 +31,6 @@ class App extends Component {
   componentDidMount() {
     AsyncStorage.getItem('token').then((t) => {
       this.setState({ token: t !== null, isLoading: false })
-      console.log(t)
     })
   }
 

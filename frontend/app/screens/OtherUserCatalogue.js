@@ -35,7 +35,7 @@ const OpenFic = ({ ficID }) => {
     )
 };
 
-class Catalogue extends Component {
+class OtherUserCatalogue extends Component {
     //Constructor
     //States are set here
     constructor() {
@@ -46,13 +46,13 @@ class Catalogue extends Component {
         }
     }
 
-    getCatalogue = async () => {
+    getCatalogue = async (catalogueID) => {
         // Gets token associated with user
         let token = await helpers.getToken()
 
         let data = null
         try {
-            const response = await fetch('http://10.0.2.2:8000/api/getCatalogue/?userid=0&catalogueID=' + this.props.route.params.id, {
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogue/?catalogueID=' + catalogueID, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -87,76 +87,11 @@ class Catalogue extends Component {
 
     // Fetches list of catalogues associated with the user when the screen is first opened
     async componentDidMount() {
-        // Add event listener so that catalogues are retrieved each time screen is focused
-        const { navigation } = this.props;
-        this.focusListener = navigation.addListener("focus", async () => {
-            this.getCatalogue()
-        });
-
-        // TO DO
-        // This is a workaround to make it not look funky when a catalogue is navigated to from profile
-        // Works fine actually but not sure that it is the best way to do this
-        // Must make state reset when catalogue is blurred or smth idk
-        // React native navigation reset can be used
-        this.focusListener = navigation.addListener("blur", async () => {
-            this.setState({ fics: [], isLoading: true })
-        });
+        userID = this.props.route.params.userID
+        catalogueID = this.props.route.params.catalogueID
+        this.getCatalogue(catalogueID)
     }
 
-    componentWillUnmount() {
-        // Remove the event listener
-        this.focusListener();
-    }
-
-    async removeFic(fic) {
-        // Set isLoading to true
-        this.setState({ isLoading: true })
-
-        // Gets user token
-        let token = await helpers.getToken();
-
-        try {
-            const response = await fetch('http://10.0.2.2:8000/api/removeFic/', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Token ' + token,
-                },
-                body: JSON.stringify({
-                    'ficID': fic.workid,
-                    'catalogueID': this.props.route.params.id
-                })
-            })
-
-            // Get status
-            const statusCode = response.status
-
-            // If unauthorised, clear token and log user out
-            if (statusCode == 401) {
-                helpers.clearToken()
-            }
-            // If success, parse data and update users
-            else if (statusCode >= 200 && statusCode < 300) {
-                this.setState({
-                    fics: this.state.fics.filter(function (f) {
-                        return f !== fic
-                    })
-                });
-            }
-            else if (statusCode >= 400 && statusCode < 500) {
-                console.log('Client error.')
-            }
-            else if (statusCode >= 500 && statusCode < 600) {
-                console.log('Server error.')
-            }
-        } catch (err) {
-            console.log(err)
-        } finally {
-            this.setState({ isLoading: false })
-        }
-
-    }
 
     render() {
         if (this.state.isLoading) {
@@ -179,12 +114,9 @@ class Catalogue extends Component {
                         </TouchableOpacity>
 
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
-                            <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
+                            <Text style={styles.pageTitleText}>{this.props.route.params.title} {'\n'}<Text style={styles.pageSubtitleText}>created by {this.props.route.params.username}</Text></Text>
                         </View>
                     </View>
-
-
-
 
                     <ScrollView>
                         {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are currently no fanfictions in this catalogue</Text>}
@@ -211,15 +143,6 @@ class Catalogue extends Component {
                                 </View>
                                 <Divider />
                                 <OpenFic ficID={fic.workid}></OpenFic>
-                                <View style={ficCardStyle.removeFicContainer}>
-                                    <TouchableOpacity
-                                        style={ficCardStyle.removeButton}
-                                        onPress={() => this.removeFic(fic)}
-                                    >
-                                        <Text style={ficCardStyle.buttonText}>Remove from catalogue</Text>
-
-                                    </TouchableOpacity>
-                                </View>
                             </View>
                         ))}
                     </ScrollView>
@@ -228,4 +151,4 @@ class Catalogue extends Component {
     }
 }
 
-export default Catalogue
+export default OtherUserCatalogue

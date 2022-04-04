@@ -27,10 +27,10 @@ class OtherUserProfile extends Component {
         // Gets token associated with user
         let token = await helpers.getToken();
 
-        username = this.props.route.params.username
+        userID = this.props.route.params.userID
 
         try {
-            const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?username=' + username, {
+            const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?id=' + userID, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -89,7 +89,7 @@ class OtherUserProfile extends Component {
                             style={styles.leftButton}
                             onPress={() => this.props.navigation.goBack()}
                         >
-                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                         </TouchableOpacity>
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Profile</Text>
@@ -127,14 +127,10 @@ class OtherUserProfile extends Component {
                                 <TouchableOpacity
                                     key={catalogue.id}
                                     style={pageStyle.catalogueContainer}
-                                    onPress={() => this.props.navigation.navigate('CatalogueStack', {
-                                        screen: 'Catalogue',
-                                        params: catalogue,
-                                        initial: false
-                                    })}
+                                    onPress={() => this.props.navigation.navigate('OtherUserCatalogue', {userID: this.props.route.params.userID, username: this.state.username, catalogueID: catalogue.id, title: catalogue.title})}
                                 >
                                     {/* Title of catalogue*/}
-                                    <Text style={pageStyle.catalogueTitle}>{catalogue.title} </Text>
+                                    <Text style={pageStyle.catalogueTitle}>{catalogue.title}</Text>
                                 </TouchableOpacity>
 
                             ))}
@@ -142,7 +138,7 @@ class OtherUserProfile extends Component {
                         <View style={pageStyle.buttonContainer}>
                             <TouchableOpacity
                                 style={pageStyle.buttonStyle}
-                                onPress={() => this.props.navigation.navigate('CatalogueStack', { screen: 'AllCatalogues' })}
+                                    onPress={() => this.props.navigation.navigate('AllOtherUserCatalogues', {userID: this.props.route.params.userID, username: this.state.username} )}
                             >
                                 <Text style={styles.buttonText}>View all catalogues</Text>
                             </TouchableOpacity>

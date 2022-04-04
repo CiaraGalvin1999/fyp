@@ -78,7 +78,7 @@ class ChangePassword extends Component {
                         style={styles.leftButton}
                         onPress={() => this.props.navigation.goBack()}
                     >
-                        <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                        <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                     </TouchableOpacity>
 
                     <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>

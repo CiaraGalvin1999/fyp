@@ -267,7 +267,7 @@ render() {
                     style={styles.leftButton}
                     onPress={() => this.props.navigation.goBack()}
                 >
-                    <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                    <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                 </TouchableOpacity>
 
                 <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
@@ -278,8 +278,8 @@ render() {
                     <TouchableOpacity
                         onPress={() => this.props.navigation.navigate('FriendRequests')}
                     >
-                        {!this.state.hasFriendRequests && <Ionicons name={'mail-outline'} size={24} color={'#FFFFFF'} />}
-                        {this.state.hasFriendRequests && <Ionicons name={'mail-unread-outline'} size={24} color={'#FFFFFF'} />}
+                        {!this.state.hasFriendRequests && <Ionicons name={'mail-outline'} size={22} color={'#FFFFFF'} />}
+                        {this.state.hasFriendRequests && <Ionicons name={'mail-unread-outline'} size={22} color={'#FFFFFF'} />}
                     </TouchableOpacity>
                 </View>
             </View>
@@ -312,7 +312,7 @@ render() {
                         <TouchableOpacity
                             key={user.id}
                             style={userCardStyle.userContainer}
-                            onPress={() => this.props.navigation.navigate('OtherUserProfile', {username: user.username})}
+                            onPress={() => this.props.navigation.navigate('OtherUserProfile', {userID: user.id})}
                         >
                             <Image
                                 style={userCardStyle.userAvatar}

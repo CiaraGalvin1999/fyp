@@ -30,7 +30,7 @@ class Profile extends Component {
         // null as it is the profile of the current user
         username = ''
         try {
-            const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?username=' + username, {
+            const response = await fetch('http://10.0.2.2:8000/api/getUserInfo/?id=0', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -89,7 +89,7 @@ class Profile extends Component {
                             style={styles.leftButton}
                             onPress={() => this.props.navigation.navigate('Friends')}
                         >
-                            <Ionicons name={'people'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'people'} size={22} color={'#FFFFFF'} />
                         </TouchableOpacity>
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
                             <Text style={styles.pageTitleText}>Profile</Text>
@@ -98,7 +98,7 @@ class Profile extends Component {
                             style={styles.rightButton}
                             onPress={() => this.props.navigation.navigate('Settings')}
                         >
-                            <Ionicons name={'settings'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'settings'} size={22} color={'#FFFFFF'} />
                         </TouchableOpacity>
                     </View>
                     <ScrollView>

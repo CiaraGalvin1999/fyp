@@ -57,7 +57,7 @@ class Settings extends Component {
                         style={styles.leftButton}
                         onPress={() => this.props.navigation.goBack()}
                     >
-                        <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                        <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                     </TouchableOpacity>
 
                     <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
@@ -73,7 +73,7 @@ class Settings extends Component {
                         <Text style={pageStyle.buttonText}>Change Username</Text>
                     </View>
                     <View style={pageStyle.changePageIcon}>
-                        <Ionicons name={'chevron-forward-outline'} size={24} color={'#FFFFFF'} />
+                        <Ionicons name={'chevron-forward-outline'} size={22} color={'#FFFFFF'} />
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -84,7 +84,7 @@ class Settings extends Component {
                         <Text style={pageStyle.buttonText}>Change Password</Text>
                     </View>
                     <View style={pageStyle.changePageIcon}>
-                        <Ionicons name={'chevron-forward-outline'} size={24} color={'#FFFFFF'} />
+                        <Ionicons name={'chevron-forward-outline'} size={22} color={'#FFFFFF'} />
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -95,7 +95,7 @@ class Settings extends Component {
                         <Text style={pageStyle.buttonText}>Logout</Text>
                     </View>
                     <View style={pageStyle.changePageIcon}>
-                        <Ionicons name={'chevron-forward-outline'} size={24} color={'#FFFFFF'} />
+                        <Ionicons name={'chevron-forward-outline'} size={22} color={'#FFFFFF'} />
                     </View>
                 </TouchableOpacity>
             </View>

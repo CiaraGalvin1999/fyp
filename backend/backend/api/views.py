@@ -167,19 +167,20 @@ def addFic(request):
 # (Make seperate function to do this)
 @api_view(('GET',))
 def getCatalogues(request):
-    data = getCataloguesHelper(request)
+    userID = int(request.GET.get('userID'))
 
-    return Response(data)
+    if userID != 0:
+        user = User.objects.get(id=userID)
 
-def getCataloguesHelper(request):
-    # Get token and associated user
-    auth = request.headers.get("Authorization", None)
-    token = auth[6:]
-    user = Token.objects.get(key=token).user
+    else:
+        # Get token and associated user
+        auth = request.headers.get("Authorization", None)
+        token = auth[6:]
+        user = Token.objects.get(key=token).user
 
     # Get all catalogues associated with user and return
     catalogues = Catalogue.objects.filter(user=user)
-    
+        
     # Create json array of catalogues (inc. title and id) and return in response 
     data = []
 
@@ -191,17 +192,14 @@ def getCataloguesHelper(request):
         data.append(result)
 
     data = json.dumps(data)
-    return data
+
+    return Response(data)
+
 
 @api_view(('GET',))
 def getCatalogue(request):
-    # Get token and associated user
-    auth = request.headers.get("Authorization", None)
-    token = auth[6:]
-    user = Token.objects.get(key=token).user
-
-    # Get ID sent in request
-    catalogueID = int(request.GET.get('id'))
+    # Get catalogue ID sent in request
+    catalogueID = int(request.GET.get('catalogueID'))
 
     # Get catalogue associated with ID
     catalogue = Catalogue.objects.get(id=catalogueID)
@@ -261,20 +259,19 @@ def createCatalogue(request):
     catalogue = Catalogue(title=title, user=user)
     catalogue.save()
 
-    data = getCataloguesHelper(request)
-
-    return Response(data)
+    # Returns catalogue id
+    return Response(catalogue.id, status=status.HTTP_201_CREATED)
 
 @api_view(('GET',))
 def getUserInfo(request):
-    # Get username sent in request
-    username = request.GET.get('username')
+    # Get id sent in request
+    userID = int(request.GET.get('id'))
     
-    # If it's not empty, then fine user with associated username
-    if len(username) > 0:
-        user = User.objects.get(username=username)
+    # If it's not 0, then find user with associated id
+    if userID != 0:
+        user = User.objects.get(id=userID)
 
-    # Otherwise get info of logged in user (username sent in request will be empty)
+    # Otherwise get info of logged in user (id sent in request will be 0)
     else:
         auth = request.headers.get("Authorization", None)
         token = auth[6:]

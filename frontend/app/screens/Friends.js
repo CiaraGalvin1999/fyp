@@ -128,7 +128,7 @@ class Friends extends Component {
                             style={styles.leftButton}
                             onPress={() => this.props.navigation.goBack()}
                         >
-                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                         </TouchableOpacity>
 
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
@@ -139,7 +139,7 @@ class Friends extends Component {
                             <TouchableOpacity
                                 onPress={() => this.props.navigation.navigate('AddFriends')}
                             >
-                                <Ionicons name={'person-add'} size={24} color={'#FFFFFF'} />
+                                <Ionicons name={'person-add'} size={22} color={'#FFFFFF'} />
                             </TouchableOpacity>
                         </View>
 
@@ -152,7 +152,7 @@ class Friends extends Component {
                                 <TouchableOpacity
                                     key={friend.id}
                                     style={userCardStyle.userContainer}
-                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', { username: friend.username })}
+                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', { userID: friend.id })}
                                 >
                                     <Image
                                         style={userCardStyle.userAvatar}

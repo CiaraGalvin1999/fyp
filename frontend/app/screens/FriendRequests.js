@@ -182,7 +182,7 @@ class FriendRequests extends Component {
                             style={styles.leftButton}
                             onPress={() => this.props.navigation.goBack()}
                         >
-                            <Ionicons name={'chevron-back-outline'} size={24} color={'#FFFFFF'} />
+                            <Ionicons name={'chevron-back-outline'} size={22} color={'#FFFFFF'} />
                         </TouchableOpacity>
 
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
@@ -198,7 +198,7 @@ class FriendRequests extends Component {
                                 <TouchableOpacity
                                     key={request.id}
                                     style={userCardStyle.userContainer}
-                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', {username: request.username})}    
+                                    onPress={() => this.props.navigation.navigate('OtherUserProfile', {userID: request.id})}    
                                 >
                                     <Image
                                         style={userCardStyle.userAvatar}

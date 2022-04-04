@@ -37,7 +37,7 @@ class AllCatalogues extends Component {
 
         let data = null
         try {
-            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues/', {
+            const response = await fetch('http://10.0.2.2:8000/api/getCatalogues/?userID=0', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token,
@@ -154,11 +154,13 @@ class AllCatalogues extends Component {
                 }
                 // If success, parse data and update users
                 else if (statusCode >= 200 && statusCode < 300) {
+                    // New catalogue is added to catalogues
                     const json = await response.json()
-                    data = JSON.parse(json)
+                    newCatalogue = {id: json, title: this.state.newTitle}
+                    this.state.catalogues.push(newCatalogue)
 
                     // Modal is no longer visible, newTitle is made null, and errors are removed from modal
-                    this.setState({ catalogues: data, catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false})
+                    this.setState({catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false})
                 }
                 else if (statusCode >= 400 && statusCode < 500) {
                     console.log('Client error.')
