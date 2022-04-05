@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 from friendship.models import Friend, FriendshipRequest, Follow, Block
 from django.contrib.auth import authenticate
+from itertools import chain
 
 import AO3
 import json
@@ -68,6 +69,7 @@ class LogoutUserAPIView(APIView):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
 
+# Allows a user to search for a fanfiction based on title and author
 @api_view(('GET',))
 def searchFic(request):
     # Gets author and title from the request
@@ -83,12 +85,10 @@ def searchFic(request):
 
     # Create new JSON object for each result
     for result in search.results:
-        # Title
-        title = result.title
-
         # ID
         workid = result.id
-
+        # Title
+        title = result.title
         # Add authors - can have multiple authors
         # authors is a list
         authors = []
@@ -101,14 +101,13 @@ def searchFic(request):
         else:
             summary = result.summary
         
-        # Create JSON object
-        resultJSON = {'title': title, 'authors': authors, 'id': workid, 'summary': summary}
+        # Create object
+        resultJSON = {'id': workid, 'title': title, 'summary': summary, 'authors': authors}
         data.append(resultJSON)
 
+    # Convert object to JSON and send to client in response
     data = json.dumps(data)
-
     return Response(data)
-
 
 @api_view(('POST',))
 def addFic(request):
@@ -125,42 +124,40 @@ def addFic(request):
     token = auth[6:]
     user = Token.objects.get(key=token).user
 
-    # Get catalogue
-    catalogue = Catalogue.objects.get(id=catalogueID)
+    # Get catalogue with catalogueID and ensure that user is the authenticated user
+    catalogue = Catalogue.objects.get(id=catalogueID, user=user)
 
-    # Check if fic is already saved in database
-    fic = Fic.objects.filter(workid=workid)
+    # Check if fic is already in database
+    # If already in the database, add fanfiction to catalogue
+    if Fic.objects.filter(workid=workid).exists():
+        catalogue.fics.add(Fic.objects.get(workid=workid))
+        catalogue.save()
 
-    # If fic is not in db, add to db
-    # Must also add authors if not already in db
-    if fic.exists() == False:
+    # If the fanfiction is not already in the catalogue, must add the fanfiction to the database
+    # And add associated authors to database if they aren't already in it
+
+    else: 
+        # First check authors - add any not in db to db
+        # Also create list of authors to be associated with fanfiction
+        ficAuthors = []
+        for a in authors:
+            if not Author.objects.filter(username=a).exists():
+                author = Author(username=a)
+                author.save()
+            
+            ficAuthors.append(Author.objects.get(username=a))
+        
+        # Then add fanfiction to database
         fic = Fic(workid=workid, title=title, summary=summary)
         fic.save()
-        for authorUsername in authors: 
-            author = Author.objects.filter(username=authorUsername)
-            
-            if author.exists() == False:
-                author = Author(username=authorUsername)
-                author.save()
+        fic.authors.set(ficAuthors)
+        fic.save()
 
-            else:
-                author = author[0]
-
-            ficAuthor = FicAuthor(fic=fic, author=author)
-            ficAuthor.save()
-
-    else:
-        fic = fic[0]
-
-    # Add fanfic to selected catalogue
-    catalogueFic = CatalogueFic(catalogue=catalogue, fic=fic)
-    catalogueFic.save()
+        catalogue.fics.add(fic)
+        catalogue.save()
 
     # Return success response
-    return Response(status=status.HTTP_200_OK)
-
-
-
+    return Response(status=status.HTTP_200_OK)   
 
 # TO DO
 # Put in a check to ensure that the work/fic still exists - if it doesnt, delete this from the database
@@ -180,69 +177,26 @@ def getCatalogues(request):
 
     # Get all catalogues associated with user and return
     catalogues = Catalogue.objects.filter(user=user)
-        
-    # Create json array of catalogues (inc. title and id) and return in response 
+
+    # Create json array of catalogues (title and id only) and return in response 
     data = []
-
     for catalogue in catalogues:
-        title = catalogue.title
-        catalogueID = catalogue.id
-
-        result = {'title': title, 'id': catalogueID}
-        data.append(result)
-
+        data.append(catalogue.title_and_id())
     data = json.dumps(data)
 
     return Response(data)
-
 
 @api_view(('GET',))
 def getCatalogue(request):
     # Get catalogue ID sent in request
     catalogueID = int(request.GET.get('catalogueID'))
 
-    # Get catalogue associated with ID
-    catalogue = Catalogue.objects.get(id=catalogueID)
+    # Get catalogue associated with ID in dictionary form
+    catalogue = Catalogue.objects.get(id=catalogueID).to_dict()
 
-    # Get all fics in the catalogue
-    cf = CatalogueFic.objects.filter(catalogue=catalogue)
-
-    # Empty array to add fics to
-    fics = []
-
-    # Check to make sure there are fics in the catalogue
-    if cf.exists():
-        # For every fic in catalogue, add title, workid, authors, and summary to object
-        # Then add fic object to fics array created above
-        for x in cf:
-            fic = x.fic
-            
-            # Title
-            title = fic.title
-
-            # ID
-            workid = fic.workid
-
-            # Add authors - can have multiple authors
-            # authors is a list
-            authors = []
-            af = FicAuthor.objects.filter(fic=fic)
-            for a in af:
-                author = a.author
-                authors.append(author.username)
-
-            # Summary - can be empty
-            if fic.summary == None:
-                summary = ''
-            else:
-                summary = fic.summary
-            
-            # Create JSON object
-            resultJSON = {'title': title, 'authors': authors, 'workid': workid, 'summary': summary}
-            fics.append(resultJSON)
-
-    fics = json.dumps(fics)
-    return Response(fics)
+    # Convert catalogue to JSON and send in response
+    data = json.dumps(catalogue)
+    return Response(data)
 
 @api_view(('POST',))
 def createCatalogue(request):
@@ -261,6 +215,41 @@ def createCatalogue(request):
 
     # Returns catalogue id
     return Response(catalogue.id, status=status.HTTP_201_CREATED)
+
+@api_view(('POST',))
+def removeFic(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    currentUser = Token.objects.get(key=token).user
+
+    # Get ID of catalogue and fanfic
+    body = json.loads(request.body)
+    ficID = body['ficID']
+    catalogueID = body['catalogueID']
+
+    # Get catalogue
+    catalogue = Catalogue.objects.get(id=catalogueID)
+
+    # Remove fanfic from catalogue
+    catalogue.fics.remove(Fic.objects.get(workid=ficID))
+    catalogue.save()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+def deleteCatalogue(request):
+    # Get ID of catalogue and fanfic
+    body = json.loads(request.body)
+    catalogueID = body['id']
+
+    # Get catalogue
+    catalogue = Catalogue.objects.get(id=catalogueID)
+    catalogue.delete()
+
+    # Return success response
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def getUserInfo(request):
@@ -283,24 +272,52 @@ def getUserInfo(request):
 
     recentCatalogues = catalogues[:6]
 
-    catalogues = []
-    for c in recentCatalogues:
-        title = c.title
-        id = c.id
-        catalogue = {'title': title, 'id': id}
-        catalogues.append(catalogue)
-
+    # Create array of catalogues (title and id only)
+    recentCats = []
+    for catalogue in recentCatalogues:
+        recentCats.append(catalogue.title_and_id())
     
     # Get number of friends
     numFriends = len(Friend.objects.friends(user))
+
+    recentActivity = getRecentActivityUser(user)
         
     # Add username of user, number of catalogues they have, 6 most recent catalogues etc, ...... to data to be returned
-    data = {'username': user.username, 'numCatalogues': numCatalogues, 'numFriends': numFriends, 'recentCatalogues': catalogues}
+    data = {'username': user.username, 'numCatalogues': numCatalogues, 'numFriends': numFriends, 'recentCatalogues': recentCats, 'recentActivity': recentActivity}
 
     # Respond with user data
     data = json.dumps(data)
     return Response(data)
 
+def getRecentActivityUser(user):
+    # Get current activity of user
+
+    # Get recently created catalogues and recently added fics
+    recentCatalogues = Catalogue.objects.filter(user=user).order_by('-created_at')
+    recentFics = CatalogueFic.objects.filter(catalogue__user=user).order_by('-created_at')
+
+    # Sort by created_at
+    recentActivity = sorted(
+        chain(recentCatalogues, recentFics),
+        key=lambda ra: ra.created_at, reverse=True)
+    # Reduce to top 10 results
+    recentActivity = recentActivity[:10]
+
+    # Put in JSON format and return
+    # Also added type so frontend knows whether its a new catalogue or a new fic in a catalogue
+    activity = []
+    for a in recentActivity:
+        if isinstance(a, Catalogue):
+            data = a.recentActivityData()
+            data['type'] = 'New Catalogue'
+            activity.append(data)
+        else: 
+            data = a.as_dict()
+            data['type'] = 'New Fic'
+            activity.append(data)
+    return json.dumps(activity)
+
+# ----- FRIEND RELATED FUNCTIONS ----- #
 @api_view(('GET',))
 def getFriends(request):
     # Get token and associated user
@@ -308,19 +325,20 @@ def getFriends(request):
     token = auth[6:]
     user = Token.objects.get(key=token).user
 
+    # Get friends of authenticated user
     friends = Friend.objects.friends(user)
 
+    # Create array of objects containing friends' info (id, username)
     data = []
-
     for f in friends:
         username = f.username
         friendID = f.id
         friend = {'username': username, 'id': friendID}
         data.append(friend)
 
+    # Convert to json object and send in response
     data = json.dumps(data)
     return Response(data)
-
 
 @api_view(('GET',))
 def searchUsers(request):
@@ -336,7 +354,6 @@ def searchUsers(request):
     
     data = json.dumps(data)
     return Response(data)
-
 
 def getUsersNotFriendsWith(currentUser, username):
     currentUsername = currentUser.username
@@ -397,7 +414,6 @@ def getFriendRequests(request):
         user = request.from_user
         username = user.username
         userID = user.id
-        requestID = request.id
 
         friendRequest = {'username': username, 'id': userID}
         data.append(friendRequest)
@@ -406,7 +422,6 @@ def getFriendRequests(request):
 
     # Return success response
     return Response(data)
-
 
 @api_view(('POST',))
 def acceptFriendRequest(request):
@@ -425,7 +440,6 @@ def acceptFriendRequest(request):
 
     # Return success response
     return Response(status=status.HTTP_200_OK)
-
 
 @api_view(('POST',))
 def denyFriendRequest(request):
@@ -497,46 +511,9 @@ def removeFriend(request):
     # Return success response
     return Response(status=status.HTTP_200_OK)
 
-@api_view(('POST',))
-def removeFic(request):
-    # Get current user
-    auth = request.headers.get("Authorization", None)
-    token = auth[6:]
-    currentUser = Token.objects.get(key=token).user
+# ----- SETTINGS RELATED FUNCTIONS ----- #
 
-    # Get ID of catalogue and fanfic
-    body = json.loads(request.body)
-    ficID = body['ficID']
-    catalogueID = body['catalogueID']
-
-    # Get catalogue
-    catalogue = Catalogue.objects.get(id=catalogueID)
-
-    # Get fic
-    fic = Fic.objects.get(workid=ficID)
-
-    # Remove fanfic from catalogue
-    catalogueFic = CatalogueFic.objects.get(catalogue=catalogue, fic=fic)
-    catalogueFic.delete()
-
-    # Return success response
-    return Response(status=status.HTTP_200_OK)
-
-@api_view(('POST',))
-def deleteCatalogue(request):
-    # Get ID of catalogue and fanfic
-    body = json.loads(request.body)
-    catalogueID = body['id']
-
-    # Get catalogue
-    catalogue = Catalogue.objects.get(id=catalogueID)
-    catalogue.delete()
-
-    # Return success response
-    return Response(status=status.HTTP_200_OK)
-
-
-
+# Change password of authenticated user
 @api_view(('POST',))
 def changePassword(request):
     # Get current user
@@ -568,7 +545,7 @@ def changePassword(request):
     return Response(status=status.HTTP_200_OK)
 
 
-
+# Change username of authenticated user
 @api_view(('POST',))
 def changeUsername(request):
     # Get current user

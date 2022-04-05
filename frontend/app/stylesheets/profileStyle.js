@@ -93,6 +93,17 @@ module.exports = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 5,
+    },
+    recentActivityContainer: {
+        width: '90%',
+        paddingLeft: '1%',
+        paddingRight: '1%',
+        alignSelf: 'center'
+    },
+    activityContainer: {
+        flexDirection: 'row',
+        paddingTop: 8,
+        paddingBottom: 8,
     }
 })
 

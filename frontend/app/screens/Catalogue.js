@@ -41,6 +41,7 @@ class Catalogue extends Component {
     constructor() {
         super();
         this.state = {
+            title: '',
             fics: [],
             isLoading: true
         }
@@ -70,7 +71,7 @@ class Catalogue extends Component {
             else if (statusCode >= 200 && statusCode < 300) {
                 const json = await response.json()
                 data = JSON.parse(json)
-                this.setState({ fics: data })
+                this.setState({ title: data.title, fics: data.fics})
             }
             else if (statusCode >= 400 && statusCode < 500) {
                 console.log('Client error.')
@@ -169,7 +170,6 @@ class Catalogue extends Component {
         else
             return (
                 <View style={styles.container}>
-
                     <View style={styles.headerContainer}>
                         <TouchableOpacity
                             style={styles.leftButton}
@@ -179,12 +179,9 @@ class Catalogue extends Component {
                         </TouchableOpacity>
 
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
-                            <Text style={styles.pageTitleText}>{this.props.route.params.title}</Text>
+                            <Text style={styles.pageTitleText}>{this.state.title}</Text>
                         </View>
                     </View>
-
-
-
 
                     <ScrollView>
                         {this.state.fics.length == 0 && <Text style={styles.emptyMessage}>There are currently no fanfictions in this catalogue</Text>}
@@ -198,7 +195,7 @@ class Catalogue extends Component {
                                     <Text style={ficCardStyle.ficTitle}>{fic.title} </Text>
                                     {/* Authors of fic */}
                                     {fic.authors.map((author, index) => (
-                                        <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
+                                        <Text style={ficCardStyle.ficAuthors} key={index}>{author.username}</Text>
                                     ))}
                                 </View>
                                 <Divider />

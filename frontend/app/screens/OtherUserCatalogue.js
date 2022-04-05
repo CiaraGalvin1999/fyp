@@ -42,7 +42,8 @@ class OtherUserCatalogue extends Component {
         super();
         this.state = {
             fics: [],
-            isLoading: true
+            isLoading: true,
+            title: ''
         }
     }
 
@@ -70,7 +71,7 @@ class OtherUserCatalogue extends Component {
             else if (statusCode >= 200 && statusCode < 300) {
                 const json = await response.json()
                 data = JSON.parse(json)
-                this.setState({ fics: data })
+                this.setState({ title: data.title, fics: data.fics})
             }
             else if (statusCode >= 400 && statusCode < 500) {
                 console.log('Client error.')
@@ -104,7 +105,6 @@ class OtherUserCatalogue extends Component {
         else
             return (
                 <View style={styles.container}>
-
                     <View style={styles.headerContainer}>
                         <TouchableOpacity
                             style={styles.leftButton}
@@ -114,7 +114,7 @@ class OtherUserCatalogue extends Component {
                         </TouchableOpacity>
 
                         <View style={[styles.pageTitleContainer, styles.containsLeftButton]}>
-                            <Text style={styles.pageTitleText}>{this.props.route.params.title} {'\n'}<Text style={styles.pageSubtitleText}>created by {this.props.route.params.username}</Text></Text>
+                            <Text style={styles.pageTitleText}>{this.state.title} {'\n'}<Text style={styles.pageSubtitleText}>created by {this.props.route.params.username}</Text></Text>
                         </View>
                     </View>
 
@@ -130,7 +130,7 @@ class OtherUserCatalogue extends Component {
                                     <Text style={ficCardStyle.ficTitle}>{fic.title} </Text>
                                     {/* Authors of fic */}
                                     {fic.authors.map((author, index) => (
-                                        <Text style={ficCardStyle.ficAuthors} key={index}>{author}</Text>
+                                        <Text style={ficCardStyle.ficAuthors} key={index}>{author.username}</Text>
                                     ))}
                                 </View>
                                 <Divider />

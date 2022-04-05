@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { View, Text, Image, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, Image, ActivityIndicator, ScrollView, TouchableOpacity, Linking } from 'react-native'
 import helpers from '../components/helpers'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Divider from '../components/Divider';
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Divider from '../components/Divider'
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/profileStyle')
+const ra = require('../stylesheets/recentActivityStyle')
 
 class Profile extends Component {
     //Constructor
@@ -20,6 +21,7 @@ class Profile extends Component {
             numCatalogues: 0,
             numFriends: 0,
             recentCatalogues: [],
+            recentActivity: []
         }
     }
 
@@ -52,7 +54,8 @@ class Profile extends Component {
                     username: data.username,
                     numCatalogues: data.numCatalogues,
                     numFriends: data.numFriends,
-                    recentCatalogues: data.recentCatalogues
+                    recentCatalogues: data.recentCatalogues,
+                    recentActivity: JSON.parse(data.recentActivity)
                 })
             }
             else if (statusCode >= 400 && statusCode < 500) {
@@ -67,10 +70,22 @@ class Profile extends Component {
             this.setState({ isLoading: false })
         }
     }
-
     async componentDidMount() {
-        // Get info about user to be shown on profile
-        this.getUserInfo()
+        // Add event listener so that catalogues are retrieved each time screen is focused
+        const { navigation } = this.props;
+        this.focusListener = navigation.addListener("focus", async () => {
+            // Get info about user to be shown on profile
+            this.getUserInfo()
+        });
+
+        this.focusListener = navigation.addListener("blur", async () => {
+            this.setState({ isLoading: true })
+        });
+    }
+
+    componentWillUnmount() {
+        // Remove the event listeners
+        this.focusListener();
     }
 
     render() {
@@ -119,7 +134,7 @@ class Profile extends Component {
                             </View>
                         </View>
 
-                        
+
                         {/* ABOUT SECTION IF I EVER WANT IT - PUT ABOUT BACK IN STATE */}
                         {/*this.state.about.length > 0 && <View style={pageStyle.aboutContainer}>
                             <Text style={pageStyle.aboutText}>{this.state.about}</Text>
@@ -135,7 +150,7 @@ class Profile extends Component {
                                     style={pageStyle.catalogueContainer}
                                     onPress={() => this.props.navigation.navigate('CatalogueStack', {
                                         screen: 'Catalogue',
-                                        params: catalogue,
+                                        params: { 'id': catalogue.id },
                                         initial: false
                                     })}
                                 >
@@ -155,6 +170,46 @@ class Profile extends Component {
                         </View>
                         <Divider />
                         <Text style={pageStyle.sectionTitle}>Recent Activity</Text>
+                        <View style={ra.recentActivityContainer}>
+                            {this.state.recentActivity.length > 0 && !this.state.isLoading && (this.state.recentActivity).map((activity, index) => (
+                                (
+                                    activity.type === 'New Catalogue' &&
+                                    <View key={index} style={ra.activityContainer}>
+                                        <View style={ra.activityIcon}>
+                                            <Ionicons name={'book'} size={18} color={'#FFFFFF'} />
+                                        </View>
+                                        <View style={ra.activityDescription}>
+                                            <Text style={ra.activityText}>{activity.username} has created a new catalogue
+                                                <Text style={ra.catalogueLink} onPress={() => this.props.navigation.navigate('CatalogueStack', {
+                                                    screen: 'Catalogue',
+                                                    params: { 'id': activity.id },
+                                                    initial: false
+                                                })}> {activity.title}</Text>
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ) ||
+                                (
+                                    activity.type === 'New Fic' &&
+                                    <View key={index} style={ra.activityContainer}>
+                                        <View style={ra.activityIcon}>
+                                            <Ionicons name={'add'} size={18} color={'#FFFFFF'} />
+                                        </View>
+                                        <View style={ra.activityDescription}>
+                                            <Text style={ra.activityText}>{activity.username} has added
+                                                <Text style={styles.linkText} onPress={() => Linking.openURL('https://archiveofourown.org/works/' + activity.ficID + '/')}> {activity.ficTitle} </Text>
+                                                to catalogue
+                                                <Text style={ra.catalogueLink} onPress={() => this.props.navigation.navigate('CatalogueStack', {
+                                                    screen: 'Catalogue',
+                                                    params: { 'id': activity.catalogueID },
+                                                    initial: false
+                                                })}> {activity.catalogueTitle}</Text>
+                                            </Text>
+                                        </View>
+                                    </View>
+                                )
+                            ))}
+                        </View>
                     </ScrollView>
                 </View>
             )

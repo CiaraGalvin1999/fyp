@@ -77,11 +77,15 @@ class AllCatalogues extends Component {
         this.focusListener = navigation.addListener("focus", async () => {
             this.getCatalogues()
         });
+        
+        this.focusListener = navigation.addListener("blur", async () => {
+            this.setState({ isLoading: true })
+        });
     }
 
     componentWillUnmount() {
         // Remove the event listener
-        this.focusListener();
+        this.focusListener()
     }
 
     // Sets state of title of new catalogue as user inputs it
@@ -308,7 +312,7 @@ class AllCatalogues extends Component {
                         <TouchableOpacity
                             key={catalogue.id}
                             style={pageStyle.catalogueContainer}
-                            onPress={() => this.props.navigation.navigate('Catalogue', catalogue)}
+                            onPress={() => this.props.navigation.navigate('Catalogue', {'id': catalogue.id})}
                         >
                             {/* Title of catalogue*/}
                             <View style={pageStyle.title}>
