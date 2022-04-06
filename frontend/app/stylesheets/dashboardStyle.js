@@ -7,17 +7,25 @@ module.exports = StyleSheet.create({
         paddingLeft: '1%',
         paddingRight: '1%',
     },
+    itemContainer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderColor: '#3D3D3D',
+    },
+    userContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        width: '100%',
+        paddingBottom: 16,
+        alignItems: 'center'
+    },
     activityContainer: {
         width: '100%',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        paddingBottom: 16,
-        borderColor: '#3D3D3D',
-        borderTopWidth:1,
-        paddingTop: 16
     },
     activityText: {
-        color: '#FFFFFF',
+        color:'#FFFFFF', 
         fontFamily: 'Roboto',
         fontSize: 14,
         textAlign: 'left',
@@ -31,6 +39,17 @@ module.exports = StyleSheet.create({
         flex: 1, // Fills width of remaining parent
         flexDirection: 'row',
         flexWrap: 'wrap',
+    },
+    avatar: {
+        width: 25,
+        height: 25,
+    },
+    usernameLink: {
+        fontWeight: 'bold',
+        fontSize: 15,
+        paddingLeft: 8,
+        color:'#FFFFFF', 
+        fontFamily: 'Roboto',
     },
     catalogueLink: {
         color: '#5DCDE9',

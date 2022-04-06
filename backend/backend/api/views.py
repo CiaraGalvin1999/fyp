@@ -577,3 +577,43 @@ def changeUsername(request):
 
     # Return success response
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(('GET',))
+def getDashboardData(request):
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get friends of current user
+    friends = Friend.objects.friends(user)
+
+    # Get page number (more data is request when user scrolls to bottom)
+    page = int(request.GET.get('page'))
+
+    # Recent catalogues of friends
+    recentCatalogues = Catalogue.objects.filter(user__in=friends).order_by('-created_at')[20*(page-1):20*page]
+    recentFics = CatalogueFic.objects.filter(catalogue__user__in=friends).order_by('-created_at')[20*(page-1):20*page]
+
+    # Sort by created_at
+    recentActivity = sorted(
+        chain(recentCatalogues, recentFics),
+        key=lambda ra: ra.created_at, reverse=True)
+
+
+    # Put in JSON format and return
+    # Also added type so frontend knows whether its a new catalogue or a new fic in a catalogue
+    activity = []
+    for a in recentActivity:
+        if isinstance(a, Catalogue):
+            data = a.recentActivityData()
+            data['type'] = 'New Catalogue'
+            activity.append(data)
+        else: 
+            data = a.as_dict()
+            data['type'] = 'New Fic'
+            activity.append(data)
+
+    activity = json.dumps(activity)
+    return Response(activity)

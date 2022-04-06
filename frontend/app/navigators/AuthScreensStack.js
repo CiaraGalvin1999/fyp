@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Import screens
-import Dashboard from '../screens/Dashboard'
+import DashboardStackScreen from './DashboardStack';
 import ProfileStackScreen from './ProfileStack'
 import CatalogueStackScreen from './CatalogueStack';
 import AddFicStackScreen from './AddFicStack';
@@ -14,13 +14,13 @@ const Tab = createBottomTabNavigator();
 
 const AuthStackScreen = ({ navigation }) => (
     <Tab.Navigator
-        initialRouteName={Dashboard}
+        initialRouteName={DashboardStackScreen}
         screenOptions={({ route, navigation }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => {
                 let iconName;
 
-                if (route.name === 'Dashboard') {
+                if (route.name === 'DashboardStack') {
                     iconName = focused ? 'home-outline' : 'home';
                 } else if (route.name === 'CatalogueStack') {
                     iconName = focused ? 'book-outline' : 'book';
@@ -41,7 +41,7 @@ const AuthStackScreen = ({ navigation }) => (
             tabBarInactiveBackgroundColor: '#0A0A0A',
         })}
     >
-        <Tab.Screen name="Dashboard" component={Dashboard} options={{ tabBarShowLabel: false }} />
+        <Tab.Screen name="DashboardStack" component={DashboardStackScreen} options={{ tabBarShowLabel: false }} />
         <Tab.Screen name="AddFicStack" component={AddFicStackScreen} options={{ tabBarShowLabel: false }} />
         <Tab.Screen name="CatalogueStack" component={CatalogueStackScreen} options={{ tabBarShowLabel: false }} />
         <Tab.Screen name="ProfileStack" component={ProfileStackScreen} options={{ tabBarShowLabel: false }} />

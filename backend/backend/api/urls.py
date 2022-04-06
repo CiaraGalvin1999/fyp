@@ -45,5 +45,7 @@ urlpatterns = [
     # Change password
     path('changePassword/', views.changePassword, name='change_password'),
     # Change username
-    path('changeUsername/', views.changeUsername, name='change_username')
+    path('changeUsername/', views.changeUsername, name='change_username'),
+    # Get dashboard data
+    path('getDashboardData/', views.getDashboardData, name='get_dashboard_data')
 ]

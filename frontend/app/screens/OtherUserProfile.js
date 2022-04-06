@@ -167,7 +167,7 @@ class OtherUserProfile extends Component {
                                     activity.type === 'New Catalogue' &&
                                     <View key={index} style={ra.activityContainer}>
                                         <View style={ra.activityIcon}>
-                                            <Ionicons name={'book'} size={18} color={'#FFFFFF'} />
+                                            <Ionicons name={'book-outline'} size={18} color={'#FFFFFF'} />
                                         </View>
                                         <View style={ra.activityDescription}>
                                             <Text style={ra.activityText}>{activity.username} has created a new catalogue
@@ -184,7 +184,7 @@ class OtherUserProfile extends Component {
                                         </View>
                                         <View style={ra.activityDescription}>
                                             <Text style={ra.activityText}>{activity.username} has added
-                                                <Text style={styles.linkText} onPress={() => Linking.openURL('https://archiveofourown.org/works/' + activity.ficID + '/')}> {activity.ficTitle} </Text>
+                                                <Text style={ra.linkText} onPress={() => Linking.openURL('https://archiveofourown.org/works/' + activity.ficID + '/')}> {activity.ficTitle} </Text>
                                                 to catalogue
                                                 <Text style={ra.catalogueLink} onPress={() => this.props.navigation.navigate('OtherUserCatalogue', {userID: activity.userID, username: activity.username, catalogueID: activity.catalogueID, title: activity.catalogueTitle})}> {activity.catalogueTitle}</Text>
                                             </Text>

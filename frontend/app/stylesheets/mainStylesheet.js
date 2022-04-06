@@ -5,6 +5,7 @@ module.exports = StyleSheet.create({
     container: {
         backgroundColor: '#0A0A0A',
         flex: 1,
+        width: '100%'
     },
     headerContainer: {
         width: '100%',
