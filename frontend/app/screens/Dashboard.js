@@ -1,7 +1,6 @@
 import React, { Component, PureComponent } from 'react'
 import { View, Text, FlatList, Linking, ActivityIndicator, Image, TouchableOpacity } from 'react-native'
 import helpers from '../components/helpers'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const styles = require('../stylesheets/mainStylesheet')
 const pageStyle = require('../stylesheets/dashboardStyle')
