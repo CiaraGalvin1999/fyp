@@ -2,16 +2,11 @@
 import { StyleSheet } from 'react-native';
 
 module.exports = StyleSheet.create({
-    catalogueContainer1: {
+    catalogueContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        height: 50
-    },
-    catalogueContainer2: {
-        backgroundColor: '#2E3138',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 50
+        paddingTop: 16,
+        paddingBottom: 16,
     },
     catalogueText: {
         fontSize: 14,

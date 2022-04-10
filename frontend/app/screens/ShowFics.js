@@ -165,16 +165,19 @@ class ShowFics extends Component {
                                     <View style={styles.modalHeader}>
                                         <Text style={styles.modalHeaderText}>Choose catalogue</Text>
                                     </View>
+                                    <Divider/>
 
                                     {/* Catalogue titles */}
                                     <ScrollView style={styles.modalMainContent}>
                                         {this.state.catalogues.length == 0 && !this.state.isLoading &&
                                             <View>
                                                 <Text style={pageStyle.noCatalogues}> You have no catalogues </Text>
+                                                {/* 
                                                 <TouchableOpacity
-                                                    onPress={() => this.props.navigation.navigate('authNav', { screen: 'Catalogue' })}>
+                                                    onPress={() => this.props.navigation.navigate('AllCatalogues')}>
                                                     <Text style={pageStyle.createCatalogueButton}>Create a catalogue here</Text>
                                                 </TouchableOpacity>
+                                                */}
                                             </View>
 
                                         }
@@ -182,7 +185,7 @@ class ShowFics extends Component {
                                             <TouchableOpacity
                                                 key={catalogue.id}
                                                 onPress={() => this.catalogueFic(catalogue.id)}
-                                                style={index % 2 == 1 && pageStyle.catalogueContainer1 || index % 2 == 0 && pageStyle.catalogueContainer2}
+                                                style={pageStyle.catalogueContainer}
                                             >
                                                 <Text style={pageStyle.catalogueText}>{catalogue.title} </Text>
                                             </TouchableOpacity>
@@ -219,7 +222,7 @@ class ShowFics extends Component {
                     {results.length > 0 && results.map((res) => (
                         <Pressable
                             key={res.id}
-                            style={({ pressed }) => [ficCardStyle.ficContainer, pressed && ficCardStyle.ficContainerPressed]}
+                            style={ficCardStyle.ficContainer}
                             onPress={() => this.openSelectCatalogueModal(res)}
                         >
                             <View style={ficCardStyle.ficHeader}>

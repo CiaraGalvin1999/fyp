@@ -1,21 +1,67 @@
-from django.contrib.auth import get_user_model
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework import status
-from rest_framework.views import APIView
-from api.serializers import CreateUserSerializer
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
-from django.contrib.auth.models import User
-from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
-from friendship.models import Friend, FriendshipRequest, Follow, Block
-from django.contrib.auth import authenticate
+# ----- IMPORTS ----- #
+# AO3 Third Party API
+import AO3
+
+# json library to work with JSON data
+import json
+
+# Itertools for efficient loops
 from itertools import chain
 
-import AO3
-import json
+# Libraries for working with REST framework
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.models import Token
+from rest_framework.generics import CreateAPIView
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+
+# Django auth user model
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model, authenticate
+
+# Custom models and custom serializers
+from api.serializers import CreateUserSerializer
+from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
+
+# Friendship library for friend functionality
+from friendship.models import Friend, FriendshipRequest, Follow, Block
+
+
+# Function that checks if password passes criteria/requirements
+# Requirements:
+# Password must be at least 8 characters long.
+# It must be a mix of both upper and lowercase letters.
+# It should be a mix of letters and numbers.
+# It must contain at least one special character (. , ! ? @ #)
+def checkPasswordCriteria(password):
+    # Checks length
+    if len(password) < 8:
+        return False
+    
+    # Checks if there is a combination of letters and numbers
+    if all(l.isalpha() == True for l in password):
+        return False
+    
+    # Checks that there is a mix of combination of upper and lowercase characters
+    # Boolean is true if there is at least one upper and one lower
+    isCombination = any(l.islower() for l in password) and any(l.isupper() for l in password)
+    if not isCombination:
+        return False
+
+    # Check that password has a special character
+    # List of special characters
+    specialChars = ['.', ',', '!', '?', '@', '#']
+
+    # Boolean is true if there is at least 1 special character
+    hasSpecialChar = any(l in specialChars for l in password)
+    if not hasSpecialChar:
+        return False
+
+    # Return true if all criteria are met
+    return True
 
 #User view
 class CreateUserAPIView(CreateAPIView):
@@ -29,17 +75,26 @@ class CreateUserAPIView(CreateAPIView):
         body = json.loads(request.body)
         username = body['username']
         email = body['email']
-
-        # Check if username is already taken
+        password = body['password']
+    
+        # Check if username or email have already been taken
+        # If both have been taken
         if User.objects.filter(username=username).exists() & User.objects.filter(email=email).exists(): 
             return Response('Sorry, both the username and email you have entered have already been taken.', status=status.HTTP_409_CONFLICT)
 
+        # If username has been taken
         elif User.objects.filter(username=username).exists():
             return Response('Sorry, this username has already been taken.', status=status.HTTP_409_CONFLICT)
 
+        # If email has been taken
         elif User.objects.filter(email=email).exists():
             return Response('Sorry, this email has already been used to create an account.', status=status.HTTP_409_CONFLICT)
         
+        # Check that password meets requirements
+        elif not checkPasswordCriteria(password):
+            return Response('The password must:\nBe at least 8 characters long\nContain a mix of both upper and lowercase letters\nContain letters and numbers\nContain at least one special character (. , ! ? @ #)', status=status.HTTP_403_FORBIDDEN)
+
+
         else:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)

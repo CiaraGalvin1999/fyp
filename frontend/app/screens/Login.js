@@ -74,9 +74,6 @@ render() {
 
     return (
         <View style={styles.container}>
-
-            <View style={styles.spaceTop} />
-
             <View styles={styles.logoContainer}>
                 <Image style={styles.logo} source={require('../assets/logo.png')} />
             </View>

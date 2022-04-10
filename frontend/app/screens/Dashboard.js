@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react'
+import React, { Component } from 'react'
 import { View, Text, FlatList, Linking, ActivityIndicator, Image, TouchableOpacity } from 'react-native'
 import helpers from '../components/helpers'
 

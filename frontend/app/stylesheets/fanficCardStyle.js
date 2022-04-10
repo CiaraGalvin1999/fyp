@@ -9,9 +9,6 @@ module.exports = StyleSheet.create({
         borderWidth: 1,
         backgroundColor: '#121212'
     },
-    ficContainerPressed: {
-        backgroundColor: '#404040'
-    },
     ficHeader: {
         padding: 6,
     },

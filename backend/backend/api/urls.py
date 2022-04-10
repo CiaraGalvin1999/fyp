@@ -4,12 +4,17 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
+    # ----- AUTHENTICATION PATHS ----- #
+
     # Login path - returns token and user id in response
     path('auth/login/', obtain_auth_token, name='auth_user_login'),
     # Registration path
     path('auth/register/', CreateUserAPIView.as_view(), name='auth_user_create'),
     # Logout path - deletes token
     path('auth/logout/', LogoutUserAPIView.as_view(), name='auth_user_logout'),
+
+    # ----- CATALOGUE AND FANFICTION PATHS ----- #
+
     # Search fic path - returns list of fics based on title and author sent in request
     path('searchFic/', views.searchFic, name='search_fic'),
     # Add fic to a specified catalogue
@@ -20,8 +25,18 @@ urlpatterns = [
     path('getCatalogue/', views.getCatalogue, name='get_catalogue'),
     # Create a new catalogue
     path('createCatalogue/', views.createCatalogue, name='create_catalogue'),
+    # Remove fic from catalogue
+    path('removeFic/', views.removeFic, name='remove_fic'),
+    # Delete catalogue
+    path('deleteCatalogue/', views.deleteCatalogue, name='delete_catalogue'),
+
+    # ----- PROFILE PATHS ----- #
+
     # Get info needed for profile view
     path('getUserInfo/', views.getUserInfo, name='get_user_info'),
+
+    # ----- FRIEND PATHS ----- #
+
     # Get list of users friends
     path('getFriends/', views.getFriends, name='get_friends'),
     # Search for users
@@ -38,14 +53,16 @@ urlpatterns = [
     path('hasFriendRequests/', views.hasFriendRequests, name='has_friend_requests'),
     # Remove friend
     path('removeFriend/', views.removeFriend, name='remove_friend'),
-    # Remove fic from catalogue
-    path('removeFic/', views.removeFic, name='remove_fic'),
-    # Delete catalogue
-    path('deleteCatalogue/', views.deleteCatalogue, name='delete_catalogue'),
+    
+    # -----SETTINGS PATHS ----- #
+
     # Change password
     path('changePassword/', views.changePassword, name='change_password'),
     # Change username
     path('changeUsername/', views.changeUsername, name='change_username'),
+
+    # ----- DASHBOARD PATHS ----- #
+    
     # Get dashboard data
     path('getDashboardData/', views.getDashboardData, name='get_dashboard_data')
 ]

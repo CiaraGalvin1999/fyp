@@ -62,8 +62,8 @@ module.exports = StyleSheet.create({
         justifyContent: 'center',
     },
     logo: {
-        width: 160,
-        height: 160,
+        width: 300,
+        height: 200,
         alignSelf: 'center',
     },
     fieldContainer: {
@@ -117,6 +117,7 @@ module.exports = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         margin: '5%',
+        borderRadius: 5,
     },
     modalOverlay: {
         position: 'absolute',
@@ -127,15 +128,12 @@ module.exports = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.9)'
     },
     modalMain: {
-        backgroundColor: '#121212',
+        backgroundColor: '#0A0A0A', 
     },
     modalHeader: {
-        backgroundColor: '#121212',
-        paddingTop: 10,
-        paddingBottom: 10,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#FFFFFF'
-
+        backgroundColor: '#0A0A0A',
+        paddingTop: 12,
+        paddingBottom: 12,
     },
     modalHeaderText: {
         color: '#FFFFFF',
@@ -147,34 +145,42 @@ module.exports = StyleSheet.create({
     },
     modalFooter: {
         flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'center',
+        backgroundColor: '#0A0A0A',
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: '#3D3D3D'
     },
     modalHalfButton: {
         width: '50%',
         height: 40,
-        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#2F7571'
     },
     modalFullButton: {
         width: '100%',
         height: 40,
-        backgroundColor: '#2F7571',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#2F7571'
     },
     modalCloseButton: {
         width: '50%',
         height: 40,
-        backgroundColor: '#0A0A0A',
         alignItems: 'center',
         justifyContent: 'center',
     },
     requiredErrorMessage: {
         paddingTop: 8,
-        width: '80%',
+        width: '70%',
         color: '#FF6C0A',
         alignSelf: 'center',
-        textAlign: 'center',
+        textAlign: 'left',
+        fontSize: 12
+    },
+    modalRequiredErrorMessage: {
+        width: '100%'
     },
     // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
     emptyMessage: {

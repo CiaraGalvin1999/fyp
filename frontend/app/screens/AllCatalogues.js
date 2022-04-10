@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity, Modal, TouchableWithoutFeedback, TextInpu
 import helpers from '../components/helpers'
 import { ScrollView } from 'react-native-gesture-handler'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Divider from '../components/Divider'
 
 // Stylesheets
 const styles = require('../stylesheets/mainStylesheet');
@@ -77,7 +78,7 @@ class AllCatalogues extends Component {
         this.focusListener = navigation.addListener("focus", async () => {
             this.getCatalogues()
         });
-        
+
         this.focusListener = navigation.addListener("blur", async () => {
             this.setState({ isLoading: true })
         });
@@ -160,11 +161,11 @@ class AllCatalogues extends Component {
                 else if (statusCode >= 200 && statusCode < 300) {
                     // New catalogue is added to catalogues
                     const json = await response.json()
-                    newCatalogue = {id: json, title: this.state.newTitle}
+                    newCatalogue = { id: json, title: this.state.newTitle }
                     this.state.catalogues.push(newCatalogue)
 
                     // Modal is no longer visible, newTitle is made null, and errors are removed from modal
-                    this.setState({catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false})
+                    this.setState({ catalogueModalVisible: false, newTitle: '', titleNullError: false, notUniqueTitleError: false })
                 }
                 else if (statusCode >= 400 && statusCode < 500) {
                     console.log('Client error.')
@@ -257,15 +258,16 @@ class AllCatalogues extends Component {
                             <View style={styles.modalHeader}>
                                 <Text style={styles.modalHeaderText}>Create new catalogue</Text>
                             </View>
+                            <Divider />
                             <View style={styles.modalMainContent}>
-                                {this.state.titleNullError && <Text style={styles.requiredErrorMessage}>Please enter a title</Text>}
-                                {this.state.notUniqueTitleError && <Text style={styles.requiredErrorMessage}>You cannot have two catalogues with the same name</Text>}
+                                {this.state.titleNullError && <Text style={[styles.requiredErrorMessage, styles.modalRequiredErrorMessage]}>Please enter a title</Text>}
+                                {this.state.notUniqueTitleError && <Text style={[styles.requiredErrorMessage, styles.modalRequiredErrorMessage]}>You cannot have two catalogues with the same name</Text>}
                                 <View style={styles.fieldContainer}>
                                     <TextInput
                                         style={{ color: '#FFFFFF' }}
                                         autoCapitalize="none"
                                         autoCorrect={false}
-                                        placeholder="Enter title..."
+                                        placeholder="Enter catalogue title..."
                                         placeholderTextColor='#CBCBCB'
                                         onChangeText={this.updateNewTitle}
                                         maxLength={100}
@@ -273,21 +275,22 @@ class AllCatalogues extends Component {
                                     ></TextInput>
                                 </View>
                             </View>
+                            <View style={styles.modalFooter}>
+                                <TouchableOpacity
+                                    style={styles.modalHalfButton}
+                                    onPress={this.createCatalogue}
+                                >
+                                    <Text style={styles.buttonText}>Create</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.modalCloseButton}
+                                    onPress={() => this.closeModal()}
+                                >
+                                    <Text style={styles.buttonText}>Close</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={styles.modalFooter}>
-                            <TouchableOpacity
-                                style={styles.modalHalfButton}
-                                onPress={this.createCatalogue}
-                            >
-                                <Text style={styles.buttonText}>Create</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.modalCloseButton}
-                                onPress={() => this.closeModal()}
-                            >
-                                <Text style={styles.buttonText}>Close</Text>
-                            </TouchableOpacity>
-                        </View>
+
                     </View>
                 </Modal>
 
@@ -312,16 +315,18 @@ class AllCatalogues extends Component {
                         <TouchableOpacity
                             key={catalogue.id}
                             style={pageStyle.catalogueContainer}
-                            onPress={() => this.props.navigation.navigate('Catalogue', {'id': catalogue.id})}
+                            onPress={() => this.props.navigation.navigate('Catalogue', { 'id': catalogue.id })}
                         >
                             {/* Title of catalogue*/}
                             <View style={pageStyle.title}>
                                 <Text style={pageStyle.titleText}>{catalogue.title}</Text>
                             </View>
                             <View style={pageStyle.buttonsContainer}>
+                                {/*
                                 <View style={pageStyle.changePageIcon}>
                                     <Ionicons name={'chevron-forward-outline'} size={22} color={'#FFFFFF'} />
                                 </View>
+                                */}
                                 <TouchableOpacity
                                     style={pageStyle.deleteCatalogueButton}
                                     onPress={() => this.deleteCatalogue(catalogue)}
