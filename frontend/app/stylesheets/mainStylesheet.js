@@ -180,7 +180,8 @@ module.exports = StyleSheet.create({
         fontSize: 12
     },
     modalRequiredErrorMessage: {
-        width: '100%'
+        width: '100%',
+        textAlign: 'center',
     },
     // When there are no results for a fanfic, no fanfics in a catalogue, no catalogues, no summary, etc.
     emptyMessage: {

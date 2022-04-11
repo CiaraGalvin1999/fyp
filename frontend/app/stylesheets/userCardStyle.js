@@ -43,6 +43,7 @@ module.exports = StyleSheet.create({
         borderColor: '#2F7571',
         borderRadius: 5,
         padding: 8,
+        width: '90%'
     },
     denyButtonContainer: {
         width: '50%',
@@ -53,6 +54,7 @@ module.exports = StyleSheet.create({
         borderColor: '#3D3D3D',
         borderRadius: 5,
         padding: 8,
+        width: '90%'
     },
     buttonText: {
         color: '#FFFFFF',

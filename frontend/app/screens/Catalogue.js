@@ -1,5 +1,5 @@
 import React, { Component, useCallback } from 'react'
-import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert } from 'react-native'
+import { View, ActivityIndicator, Text, TouchableOpacity, Linking, Alert, Modal, TouchableWithoutFeedback } from 'react-native'
 import helpers from '../components/helpers'
 import { ScrollView } from 'react-native-gesture-handler'
 import Divider from '../components/Divider'
@@ -43,7 +43,10 @@ class Catalogue extends Component {
         this.state = {
             title: '',
             fics: [],
-            isLoading: true
+            isLoading: true,
+            removeModalVisible: false,
+            ficToBeRemoved: null,
+            ficToBeRemovedTitle: ''
         }
     }
 
@@ -71,7 +74,7 @@ class Catalogue extends Component {
             else if (statusCode >= 200 && statusCode < 300) {
                 const json = await response.json()
                 data = JSON.parse(json)
-                this.setState({ title: data.title, fics: data.fics})
+                this.setState({ title: data.title, fics: data.fics })
             }
             else if (statusCode >= 400 && statusCode < 500) {
                 console.log('Client error.')
@@ -109,9 +112,19 @@ class Catalogue extends Component {
         this.focusListener();
     }
 
-    async removeFic(fic) {
+    verifyRemove(fic) {
+        // Opens modal
+        this.setState({ ficToBeRemoved: fic, ficToBeRemovedTitle: fic.title, removeModalVisible: true})
+    }
+
+    closeModal() {
+        this.setState({ removeModalVisible: false, ficToBeRemoved: null, ficToBeRemovedTitle: '' })
+    }
+
+    async removeFic() {
         // Set isLoading to true
         this.setState({ isLoading: true })
+        fic = this.state.ficToBeRemoved
 
         // Gets user token
         let token = await helpers.getToken();
@@ -154,7 +167,7 @@ class Catalogue extends Component {
         } catch (err) {
             console.log(err)
         } finally {
-            this.setState({ isLoading: false })
+            this.setState({ isLoading: false, removeModalVisible: false, ficToBeRemoved: null, ficToBeRemovedTitle: '' })
         }
 
     }
@@ -169,7 +182,51 @@ class Catalogue extends Component {
         }
         else
             return (
+
                 <View style={styles.container}>
+
+                    {/* REMOVE FIC MODAL */}
+                    <Modal
+                        visible={this.state.removeModalVisible}
+                        animationType="slide"
+                        transparent={true}
+                        onRequestClose={() => this.setState({ removeModalVisible: false })}
+                    >
+                        <TouchableWithoutFeedback onPress={() => this.closeModal()}>
+                            <View style={styles.modalOverlay} />
+                        </TouchableWithoutFeedback>
+
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalMain}>
+                                <View style={styles.modalHeader}>
+                                    <Text style={styles.modalHeaderText}>Are you sure you want to remove this fanfiction? </Text>
+                                </View>
+                                <Divider />
+                                <View style={styles.modalMainContent}>
+                                    <Text style={pageStyle.removeFicTitle}>{this.state.ficToBeRemovedTitle}</Text>
+                                </View>
+                                <View style={styles.modalFooter}>
+                                    <TouchableOpacity
+                                        style={styles.modalHalfButton}
+                                        onPress={() => this.removeFic()}
+                                    >
+                                        <Text style={styles.buttonText}>Confirm</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.modalCloseButton}
+                                        onPress={() => this.closeModal()}
+                                    >
+                                        <Text style={styles.buttonText}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                        </View>
+                    </Modal>
+
+
+
+
                     <View style={styles.headerContainer}>
                         <TouchableOpacity
                             style={styles.leftButton}
@@ -211,7 +268,7 @@ class Catalogue extends Component {
                                 <View style={ficCardStyle.removeFicContainer}>
                                     <TouchableOpacity
                                         style={ficCardStyle.removeButton}
-                                        onPress={() => this.removeFic(fic)}
+                                        onPress={() => this.verifyRemove(fic)}
                                     >
                                         <Text style={ficCardStyle.buttonText}>Remove from catalogue</Text>
 
