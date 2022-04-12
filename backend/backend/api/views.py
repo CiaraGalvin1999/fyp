@@ -29,6 +29,9 @@ from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 # Friendship library for friend functionality
 from friendship.models import Friend, FriendshipRequest, Follow, Block
 
+# Regex
+import re
+
 
 # Function that checks if password passes criteria/requirements
 # Requirements:
@@ -42,8 +45,10 @@ def checkPasswordCriteria(password):
         return False
     
     # Checks if there is a combination of letters and numbers
-    if all(l.isalpha() == True for l in password):
+    numsAndLetters = any(l.isalpha() for l in password) and any(l.isnumeric() for l in password)
+    if not numsAndLetters:
         return False
+
     
     # Checks that there is a mix of combination of upper and lowercase characters
     # Boolean is true if there is at least one upper and one lower
@@ -76,6 +81,9 @@ class CreateUserAPIView(CreateAPIView):
         username = body['username']
         email = body['email']
         password = body['password']
+
+        # Form a valid email must take (example@example.com)
+        email_form = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
     
         # Check if username or email have already been taken
         # If both have been taken
@@ -86,10 +94,17 @@ class CreateUserAPIView(CreateAPIView):
         elif User.objects.filter(username=username).exists():
             return Response('Sorry, this username has already been taken.', status=status.HTTP_409_CONFLICT)
 
+        elif len(username) < 5:
+            return Response('Sorry, this username is too short. Must be at least 5 characters long.', status=status.HTTP_403_FORBIDDEN)
+
         # If email has been taken
         elif User.objects.filter(email=email).exists():
             return Response('Sorry, this email has already been used to create an account.', status=status.HTTP_409_CONFLICT)
         
+        # If email is not valid (i.e., not in the form example@example.com)
+        elif not re.search(email_form, email):
+            return Response('Sorry, this email is invalid. Must be in the form example@example.com.', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
         # Check that password meets requirements
         elif not checkPasswordCriteria(password):
             return Response('The password must:\nBe at least 8 characters long\nContain a mix of both upper and lowercase letters\nContain letters and numbers\nContain at least one special character (. , ! ? @ #)', status=status.HTTP_403_FORBIDDEN)
