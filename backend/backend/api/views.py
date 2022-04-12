@@ -194,14 +194,28 @@ def addFic(request):
     token = auth[6:]
     user = Token.objects.get(key=token).user
 
-    # Get catalogue with catalogueID and ensure that user is the authenticated user
+    # Get catalogue and make sure it exists and that it belongs to authenticated user
+    if not Catalogue.objects.filter(id=catalogueID, user=user).exists():
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # Get catalogue
     catalogue = Catalogue.objects.get(id=catalogueID, user=user)
 
     # Check if fic is already in database
     # If already in the database, add fanfiction to catalogue
     if Fic.objects.filter(workid=workid).exists():
-        catalogue.fics.add(Fic.objects.get(workid=workid))
-        catalogue.save()
+        fic = Fic.objects.get(workid=workid)
+
+        #Check if fanfiction is already in catalogue
+        # If it is, return 409 for conflict
+        if CatalogueFic.objects.filter(catalogue=catalogue, fic=fic).exists():
+            return Response(status=status.HTTP_409_CONFLICT)
+
+        # Otherwise add fic to catalogue
+        else:
+            catalogue.fics.add(fic)
+            catalogue.save()
+        
 
     # If the fanfiction is not already in the catalogue, must add the fanfiction to the database
     # And add associated authors to database if they aren't already in it
@@ -227,7 +241,7 @@ def addFic(request):
         catalogue.save()
 
     # Return success response
-    return Response(status=status.HTTP_200_OK)   
+    return Response(status=status.HTTP_201_CREATED)   
 
 # TO DO
 # Put in a check to ensure that the work/fic still exists - if it doesnt, delete this from the database
@@ -279,6 +293,10 @@ def createCatalogue(request):
     body = json.loads(request.body)
     title = body['title']
 
+    # Check if user already has a catalogue with that title
+    if Catalogue.objects.filter(user=user, title=title).exists():
+        return Response(status=status.HTTP_409_CONFLICT)
+
     # Create catalogue
     catalogue = Catalogue(title=title, user=user)
     catalogue.save()
@@ -291,18 +309,36 @@ def removeFic(request):
     # Get current user
     auth = request.headers.get("Authorization", None)
     token = auth[6:]
-    currentUser = Token.objects.get(key=token).user
+    user = Token.objects.get(key=token).user
 
     # Get ID of catalogue and fanfic
     body = json.loads(request.body)
     ficID = body['ficID']
     catalogueID = body['catalogueID']
 
-    # Get catalogue
-    catalogue = Catalogue.objects.get(id=catalogueID)
+    # Check that catalogue exists and belongs to user
+    # If not, return a 204
+    if not Catalogue.objects.filter(user=user, id=catalogueID).exists():
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # Remove fanfic from catalogue
-    catalogue.fics.remove(Fic.objects.get(workid=ficID))
+    # If it does, check that fanfiction is in catalogue
+    # Get catalogue
+    catalogue = Catalogue.objects.get(user=user, id=catalogueID)
+
+    # Check that fic exists
+    # If not return 204
+    if not Fic.objects.filter(workid=ficID).exists():
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # If it exists, check that it is in catalogue
+    fic = Fic.objects.get(workid=ficID)
+
+    # If not in catalogue, return a 204
+    if not CatalogueFic.objects.filter(catalogue=catalogue, fic=fic).exists():
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # Otherwise remove fanfic from catalogue
+    catalogue.fics.remove(fic)
     catalogue.save()
 
     # Return success response
@@ -310,12 +346,21 @@ def removeFic(request):
 
 @api_view(('POST',))
 def deleteCatalogue(request):
-    # Get ID of catalogue and fanfic
+    # Get current user
+    auth = request.headers.get("Authorization", None)
+    token = auth[6:]
+    user = Token.objects.get(key=token).user
+
+    # Get ID of catalogue
     body = json.loads(request.body)
     catalogueID = body['id']
 
-    # Get catalogue
-    catalogue = Catalogue.objects.get(id=catalogueID)
+    # If catalogue does not exist, return a 204
+    if not (Catalogue.objects.filter(user=user, id=catalogueID)).exists():
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # Otherwise get catalogue and delete it
+    catalogue = Catalogue.objects.get(user=user, id=catalogueID)
     catalogue.delete()
 
     # Return success response

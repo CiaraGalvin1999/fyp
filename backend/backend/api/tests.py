@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 import json
+from rest_framework.authtoken.models import Token
 
 # Create your tests here.
 
@@ -150,3 +151,302 @@ class RegistrationTest(TestCase):
         registrationDetails = {'username': 'testuser2', 'email': 'test2@test.com', 'password': 'testPassword1'}
         self.response = self.client.post('/api/auth/register/', data=json.dumps(registrationDetails), content_type='application/json')
         self.assertEqual(self.response.status_code, 403)
+
+
+# ----- TEST CATALOGUE FUNCTIONS ----- #
+class CatalogueTest(TestCase):
+    # In set up, a user is created that will be used in the tests
+    # A catalogue with fanfictions will also be created
+    # Client is also initialised
+    def setUp (self):
+        # User is created
+        self.user = User.objects.create_user(username='testuser', email='test@test.com')
+        self.user.set_password('testPassword1!')
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+
+        # Client is initialised
+        self.client = Client()
+
+        # Catalogue is created
+        self.catalogue = Catalogue(title='Test Catalogue', user=self.user)
+        self.catalogue.save()
+
+        # Create author
+        self.author = Author(username='testauthor')
+        self.author.save()
+
+        # Create fanfiction
+        self.fanfiction = Fic(workid=1000, title='Test Fic 1', summary='Test Summary 1')
+        self.fanfiction.save()
+        self.fanfiction.authors.add(self.author)
+        self.fanfiction.save()
+
+        # Add fanfiction to catalogue
+        self.cataloguefic = CatalogueFic(catalogue=self.catalogue, fic=self.fanfiction)
+        self.cataloguefic.save()
+
+        # Create second user 
+        self.user2 = User.objects.create_user(username='testuser2', email='test2@test.com')
+        self.user2.set_password('testPassword1!')
+        self.user2.save()
+
+        # Create catalogue for user 2
+        self.catalogue2 = Catalogue(title='Test Catalogue User 2', user=self.user2)
+        self.catalogue2.save()
+
+        # Create second fanfiction
+        self.fanfiction2 = Fic(workid=1001, title='Test Fic 2', summary='Test Summary 2')
+        self.fanfiction2.save()
+        self.fanfiction2.authors.add(self.author)
+        self.fanfiction2.save()
+
+    
+
+    # Runs after tests are completed to clean up testing database
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+        self.author.delete()
+        self.catalogue.delete()
+        self.fanfiction.delete()
+        self.cataloguefic.delete()
+        self.user2.delete()
+        self.catalogue2.delete()
+
+    # Test that catalogue is created successfully when given a unique title
+    def test_successful_create_catalogue(self):
+        catalogueDetails = {'title': 'Test Catalogue 2'}
+        self.response = self.client.post('/api/createCatalogue/', data=json.dumps(catalogueDetails), content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 201)
+
+    # Test that catalogue creation fails if the user tries to create a catalgoue
+    # with the same title as another catalogue they created
+    def test_not_unique_title(self):
+        catalogueDetails = {'title': 'Test Catalogue'}
+        self.response = self.client.post('/api/createCatalogue/', data=json.dumps(catalogueDetails), content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 409)
+
+    # Test that a 401 is returned if the user is not authorised
+    def test_not_authorised_create_catalogue(self):
+        catalogueDetails = {'title': 'Test Catalogue 2'}
+        self.response = self.client.post('/api/createCatalogue/', data=json.dumps(catalogueDetails), content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that catalogues of current user are successfully retrieved
+    def test_successful_get_catalogues(self):
+        self.response = self.client.get('/api/getCatalogues/?userID=0', content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that catalogues of current user are not successfully retrieved
+    # if user does not send authentication token
+    def test_not_authorised_get_catalogues(self):
+        self.response = self.client.get('/api/getCatalogues/?userID=0', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+        
+    # Test that catalogues of other user are successfully retrieved
+    def test_successful_get_other_user_catalogues(self):
+        userID = str(self.user2.id)
+        self.response = self.client.get('/api/getCatalogues/?userID='+userID, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that catalogues of other user are not successfully retrieved
+    # if user does not send authentication token
+    def test_not_authorised_get_other_user_catalogues(self):
+        userID = str(self.user2.id)
+        self.response = self.client.get('/api/getCatalogues/?userID='+userID, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that catalogue of current user is retrieved successfully if authorised
+    def test_successful_get_catalogue(self):
+        catalogueID = str(self.catalogue.id)
+        self.response = self.client.get('/api/getCatalogue/?userID=0&catalogueID=' + catalogueID, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that catalogue of current user is not retrieved if not authorised
+    def test_not_authorised_get_catalogue(self):
+        userID = str(self.user2.id)
+        catalogueID = str(self.catalogue2.id)
+        self.response = self.client.get('/api/getCatalogue/?userID=0&catalogueID' + catalogueID, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that other users' catalogue is retrieved successfully if authorised
+    def test_successful_get_other_user_catalogue(self):
+        userID = str(self.user2.id)
+        catalogueID = str(self.catalogue2.id)
+        self.response = self.client.get('/api/getCatalogue/?userID=' + userID + '&catalogueID=' + catalogueID, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that other user's catalogue is not retrieved if not authorised
+    def test_not_authorised_get_other_user_catalogue(self):
+        userID = str(self.user2.id)
+        catalogueID = str(self.catalogue2.id)
+        self.response = self.client.get('/api/getCatalogue/?userID=' + userID + '&catalogueID=' + catalogueID, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Successful delete catalogue
+    def test_successful_delete_catalogue(self):
+        self.response = self.client.post('/api/deleteCatalogue/', data={'id':str(self.catalogue.id)}, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Trying to delete catalogue that does not exist will return a 204
+    # This will ensure that client still thinks the resource is deleted
+    def test_delete_non_existent_catalogue(self):
+        self.response = self.client.post('/api/deleteCatalogue/', data={'id':164}, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Not successful because not authorised
+    def test_not_authorised_delete_catalogue(self):
+        self.response = self.client.post('/api/deleteCatalogue/', data={'id':164}, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Trying to delete catalogue of other user will not work
+    # Will return a 204 as the authorised user will not have a catalogue
+    # with that ID
+    def test_delete_catalogue_of_other_user(self):
+        self.response = self.client.post('/api/deleteCatalogue/', data={'id':self.catalogue2.id}, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Test that the user cannot attempt to search for fics if not authorised
+    # No other tests really needed for this because it just uses AO3 api
+    def test_not_authorised_search_fic(self):
+        self.response = self.client.get('/api/searchFic/?title=test&author=test', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that add fic works if user authorised and fic not already in catalogue
+    # and catalogue begins to user
+    def test_successful_add_fic(self):
+        ficDetails = {
+            'workid': 1001,
+            'title': 'Test Fic 2',
+            'summary': 'Test Summary 2',
+            'authors': self.author.username,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 201)
+
+
+    # Test trying to add fanfiction to a catalogue that it is already in
+    # Should respond with a 409 for conflict
+    def test_add_fic_already_in_catalogue(self):
+        ficDetails = {
+            'workid': 1000,
+            'title': 'Test Fic 1',
+            'summary': 'Test Summary 1',
+            'authors': self.author.username,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 409)
+
+
+    # Test trying to add to catalogue that does not exist
+    # Should return a 400
+    def test_add_fic_catalogue_doesnt_exist(self):
+        ficDetails = {
+            'workid': 1000,
+            'title': 'Test Fic 1',
+            'summary': 'Test Summary 1',
+            'authors': self.author.username,
+            'catalogueID': 164,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+
+    # Test trying to add to catalogue that belongs to someone else
+    # Should return a 400
+    def test_add_fic_other_user_catalogue(self):
+        ficDetails = {
+            'workid': 1001,
+            'title': 'Test Fic 2',
+            'summary': 'Test Summary 2',
+            'authors': self.author.username,
+            'catalogueID': self.catalogue2.id,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+
+    # Test trying to add fanfiction to catalogue if not authorised
+    # Should return 401
+    def test_not_authorised_add_fic(self):
+        ficDetails = {
+            'workid': 1001,
+            'title': 'Test Fic 2',
+            'summary': 'Test Summary 2',
+            'authors': self.author.username,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test adding a fanfic that does not exist in database yet
+    # Should returns 201
+    def test_add_fic_not_yet_in_db(self):
+        ficDetails = {
+            'workid': 2000,
+            'title': 'Test Fic New',
+            'summary': 'Test Summary New',
+            'authors': self.author.username,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/addFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 201)
+
+
+    # Test remove fic successfully
+    # Should return 200
+    def test_successful_remove_fic(self):
+        ficDetails = {
+            'ficID': 1000,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Try remove fic that doesn't exist 
+    def test_remove_fic_doesnt_exist(self):
+        ficDetails = {
+            'ficID': 2000,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Try remove fic that isn't in catalogue (but does exist!) 
+    def test_remove_fic_doesnt_exist(self):
+        ficDetails = {
+            'ficID': 1001,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Try remove from catalogue that doesn't exist
+    def test_remove_fic_catalogue_doesnt_exist(self):
+        ficDetails = {
+            'ficID': 1000,
+            'catalogueID': 164,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Try remove from catalogue that belongs to other user
+    def test_remove_fic_other_user_catalogue(self):
+        ficDetails = {
+            'ficID': 1000,
+            'catalogueID': self.catalogue2.id,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Test not authorised
+    def test_not_authorised_remove_fic(self):
+        ficDetails = {
+            'ficID': 1000,
+            'catalogueID': self.catalogue.id,
+        }
+        self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
