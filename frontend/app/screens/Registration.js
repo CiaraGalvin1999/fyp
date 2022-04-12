@@ -79,10 +79,10 @@ class Registration extends Component {
                 this.setState({ errorMessage: json })
             }
             else if (statusCode > 400 && statusCode < 500) {
-                console.log('Client error.')
+                this.setState({ errorMessage: 'Client error. Please try again later' })
             }
             else if (statusCode >= 500 && statusCode < 600) {
-                console.log('Server error.')
+                this.setState({ errorMessage: 'Server error. Please try again later' })
             }
         } catch (err) {
             console.log(err)
