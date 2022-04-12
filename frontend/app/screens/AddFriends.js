@@ -1,5 +1,5 @@
-import React, { Component, useReducer } from 'react'
-import { Text, View, TouchableOpacity, ActivityIndicator, TextInput, ScrollView, Image } from 'react-native'
+import React, { Component } from 'react'
+import { Text, View, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native'
 import helpers from '../components/helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 

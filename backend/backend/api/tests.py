@@ -450,3 +450,273 @@ class CatalogueTest(TestCase):
         self.response = self.client.post('/api/removeFic/', data=ficDetails, content_type='application/json')
         self.assertEqual(self.response.status_code, 401)
 
+
+# ----- TEST DASHBOARD FUNCTIONS ----- #
+class DashboardTest(TestCase):
+    # In set up, a user is created that will be used in the tests
+    # A catalogue with fanfictions will also be created
+    # Client is also initialised
+    def setUp (self):
+        # User is created
+        self.user = User.objects.create_user(username='testuser', email='test@test.com')
+        self.user.set_password('testPassword1!')
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+
+    # Runs after tests are completed to clean up testing database
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+
+
+    # Test successful get dashboard data (recent activity)
+    def test_successful_get_dashboard_data(self):
+        self.response = self.client.get('/api/getDashboardData/', data={'page': 1}, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test unauthorised get dashboard data
+    def test_not_authorised_get_dashboard_data(self):
+        self.response = self.client.get('/api/getDashboardData/', data={'page': 1},  content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test invalid page number
+    # Should return 400
+    def test_invalid_page_number(self):
+        self.response = self.client.get('/api/getDashboardData/', data={'page': -1}, content_type='application/json',  **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+
+
+# ----- TEST PROFILE FUNCTIONS ----- #
+class ProfileTest(TestCase):
+    # In set up, two user are created that will be used in the tests
+    # Client is also initialised
+    def setUp (self):
+        # User is created
+        self.user = User.objects.create_user(username='testuser', email='test@test.com')
+        self.user.set_password('testPassword1!')
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+
+        # Create second user
+        self.user2 = User.objects.create_user(username='testuser2', email='test2@test.com')
+        self.user2.set_password('testPassword1!')
+        self.user2.save()
+
+    # Runs after tests are completed to clean up testing database
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+
+    # Test successfully get current user profile
+    def test_successful_get_user_info(self):
+        self.response = self.client.get('/api/getUserInfo/?id=0', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test not authorised to get current user profile
+    def test_not_authorised_get_user_info(self):
+        self.response = self.client.get('/api/getUserInfo/?id=0', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test successfully get other user profile
+    def test_successful_get_user_info(self):
+        userID = str(self.user2.id)
+        self.response = self.client.get('/api/getUserInfo/?id=' + userID, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test not authorised to get other user profile
+    def test_successful_get_user_info(self):
+        userID = str(self.user2.id)
+        self.response = self.client.get('/api/getUserInfo/?id=' + userID, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test try to get user profile of user that doesn't exist
+    def test_non_existent_user_profile(self):
+        self.response = self.client.get('/api/getUserInfo/?id=164', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+
+
+# ----- TEST SETTING FUNCTIONS ----- #
+class SettingTest(TestCase):
+    # In set up, two users are created that will be used in the tests
+    # Client is also initialised
+    def setUp (self):
+        # User is created
+        self.user = User.objects.create_user(username='testuser', email='test@test.com')
+        self.user.set_password('testPassword1!')
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+
+        # Create second user
+        self.user2 = User.objects.create_user(username='testuser2', email='test2@test.com')
+        self.user2.set_password('testPassword1!')
+        self.user2.save()
+
+    # Runs after tests are completed to clean up testing database
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+        self.user2.delete()
+
+    # Test username successful change username - unique username, correct password, authorised
+    def test_successful_change_username(self):
+        details = {
+            'newUsername': 'updated_testuser',
+            'password': 'testPassword1!',
+        }
+        self.response = self.client.post('/api/changeUsername/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+    
+    def test_not_authorised_change_username(self):
+        details = {
+            'newUsername': 'updated_testuser',
+            'password': 'testPassword1!',
+        }
+        self.response = self.client.post('/api/changeUsername/', data=details, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    def test_username_already_exists(self):
+        details = {
+            'newUsername': 'testuser2',
+            'password': 'testPassword1!',
+        }
+        self.response = self.client.post('/api/changeUsername/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 409)
+
+    def test_incorrect_password_cu(self):
+        details = {
+            'newUsername': 'updated_testuser',
+            'password': 'incorrect_password',
+        }
+        self.response = self.client.post('/api/changeUsername/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
+
+    def test_successful_change_password(self):
+        details = {
+            'oldPassword': 'testPassword1!',
+            'newPassword': 'testPassword2!',
+            'confirmNewPassword': 'testPassword2!',
+        }
+        self.response = self.client.post('/api/changePassword/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+    
+    def test_not_authorised_change_password(self):
+        details = {
+            'oldPassword': 'testPassword1!',
+            'newPassword': 'testPassword2!',
+            'confirmNewPassword': 'testPassword2!',
+        }
+        self.response = self.client.post('/api/changePassword/', data=details, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    def test_password_fail_criteria(self):
+        details = {
+            'oldPassword': 'testPassword1!',
+            'newPassword': 'test',
+            'confirmNewPassword': 'test',
+        }
+        self.response = self.client.post('/api/changePassword/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
+
+    def test_incorrect_password_cp(self):
+        details = {
+            'oldPassword': 'test',
+            'newPassword': 'testPassword2!',
+            'confirmNewPassword': 'testPassword2!',
+        }
+        self.response = self.client.post('/api/changePassword/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
+        
+
+    def test_successful_logout(self):
+        self.response = self.client.get('/api/auth/logout/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+    
+    def test_not_authorised_logout(self):
+        self.response = self.client.get('/api/auth/logout/', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+
+# ----- TEST FRIENDS FUNCTIONS ----- #
+class FriendTest(TestCase):
+    # In set up, two users are created that will be used in the tests
+    # Client is also initialised
+    def setUp (self):
+        # User is created
+        self.user = User.objects.create_user(username='testuser', email='test@test.com')
+        self.user.set_password('testPassword1!')
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+
+        # Create second user
+        self.user2 = User.objects.create_user(username='testuser2', email='test2@test.com')
+        self.user2.set_password('testPassword1!')
+        self.user2.save()
+
+    # Runs after tests are completed to clean up testing database
+    def tearDown(self):
+        self.user.delete()
+        self.token.delete()
+        self.user2.delete()
+
+    def test_successful_get_friends(self):
+        self.response = self.client.get('/api/getFriends/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_not_authorised_get_friends(self):
+        self.response = self.client.get('/api/getFriends/', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    def test_successful_search_users(self):
+        self.response = self.client.get('/api/searchUsers/?username=testuser2', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_not_authorised_search_users(self):
+        self.response = self.client.get('/api/searchUsers/?username=testuser2', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    def test_successful_get_friend_requests(self):
+        self.response = self.client.get('/api/getFriendRequests/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_not_authorised_get_friend_requests(self):
+        self.response = self.client.get('/api/getFriendRequests/', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    def test_successful_accept_friend_request(self):
+        self.response = self.client.post('/api/acceptFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_not_authorised_accept_friend_request(self):
+        self.response = self.client.post('/api/acceptFriendRequest/', {'id': self.user2.id}, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    #def test_successful_deny_friend_request(self):
+
+    #def test_not_authorised_deny_friend_request(self):
+
+    #def test_successful_send_friend_request(self):
+
+    #def test_not_authorised_send_friend_request(self):
+
+    #def test_successful_has_friend_requests(self):
+
+    #def test_not_authorised_has_friend_requests(self):
+
+    #def test_successful_remove_friend(self):
+
+    #def test_not_authorised_remove_friend(self):
+
+
+
+    #'getFriends/'
+    #'searchUsers/'
+    #'getFriendRequests/'
+    #'acceptFriendRequest/'
+    #'denyFriendRequest/'
+    #'sendFriendRequest/'
+    #'hasFriendRequests/'
+    #'removeFriend/'

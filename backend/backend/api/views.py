@@ -373,6 +373,12 @@ def getUserInfo(request):
     
     # If it's not 0, then find user with associated id
     if userID != 0:
+
+        # Check that user exists
+        # If not, return 400
+        if not User.objects.filter(id=userID).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
         user = User.objects.get(id=userID)
 
     # Otherwise get info of logged in user (id sent in request will be 0)
@@ -646,14 +652,22 @@ def changePassword(request):
     if user is not None:
         # Credentials have been authenticated
         # Check if newPassword and confirmNewPassword match
-        if newPassword == confirmNewPassword: 
+        if newPassword == confirmNewPassword:
+
+            # Make sure that new password meets requirements
+            # If not, return 403
+            if not checkPasswordCriteria(newPassword):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            # Otherwise set new password
             user.set_password(newPassword)
+            user.save()
+        # Return 400 if passwords dont match
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
     else:
         # Authentication failed - wrong password
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(status=status.HTTP_403_FORBIDDEN)
                           
 
     # Return success response
@@ -687,8 +701,8 @@ def changeUsername(request):
             user.save()
         
     else:
-        # Authentication failed - wrong password
-        return Response(status=status.HTTP_401_UNAUTHORIZED)                      
+        # If user enters incorrect password, return 403 forbidden status
+        return Response(status=status.HTTP_403_FORBIDDEN)                      
 
     # Return success response
     return Response(status=status.HTTP_200_OK)
@@ -706,6 +720,10 @@ def getDashboardData(request):
 
     # Get page number (more data is request when user scrolls to bottom)
     page = int(request.GET.get('page'))
+
+    # If invalid page number, return 400
+    if page < 1:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     # Recent catalogues of friends
     recentCatalogues = Catalogue.objects.filter(user__in=friends).order_by('-created_at')[20*(page-1):20*page]
