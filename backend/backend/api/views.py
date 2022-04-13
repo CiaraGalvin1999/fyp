@@ -554,8 +554,19 @@ def acceptFriendRequest(request):
     # Get user that sent request
     body = json.loads(request.body)
     userID = body['id']
+
+    # Make sure user exists
+    # If they don't, return a 400
+    if not User.objects.filter(id=userID):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    # Otherwise get user
     otherUser = User.objects.get(id=userID)
 
+    # If friend request doesn't exist, return a 400
+    if not FriendshipRequest.objects.filter(from_user=otherUser, to_user=currentUser):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # Otherwise accept friend request
     friend_request = FriendshipRequest.objects.get(from_user=otherUser, to_user=currentUser)
     friend_request.accept()
 
@@ -572,8 +583,19 @@ def denyFriendRequest(request):
     # Get user that sent request
     body = json.loads(request.body)
     userID = body['id']
+
+    # Make sure user exists
+    # If they don't, return a 400
+    if not User.objects.filter(id=userID):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    # Otherwise retrieve user from database
     otherUser = User.objects.get(id=userID)
 
+    # If friend request doesn't exist, return a 400
+    if not FriendshipRequest.objects.filter(from_user=otherUser, to_user=currentUser):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # Otherwise deny friend request
     friend_request = FriendshipRequest.objects.get(from_user=otherUser, to_user=currentUser)
     friend_request.delete()
     
@@ -590,8 +612,28 @@ def sendFriendRequest(request):
     # Get other user
     body = json.loads(request.body)
     userID = body['id']
+
+    # Make sure user exists
+    # If they don't, return a 400
+    if not User.objects.filter(id=userID):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # Otherwise retrieve user from database
     otherUser = User.objects.get(id=userID)
 
+    # Check if user are already friends, and if so, return a 403
+    if Friend.objects.are_friends(currentUser, otherUser):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    # If user has already sent a friend request return a 204
+    if FriendshipRequest.objects.filter(from_user=currentUser, to_user=otherUser).exists():
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # If other user has sent a friend request, return a 403
+    if FriendshipRequest.objects.filter(from_user=otherUser, to_user=currentUser).exists():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    # Otherwise user successfully sends friend request
     Friend.objects.add_friend(currentUser, otherUser)                             
 
     # Return success response
@@ -624,9 +666,20 @@ def removeFriend(request):
     # Get other user
     body = json.loads(request.body)
     userID = body['id']
+    
+     # Make sure user exists
+    # If they don't, return a 400
+    if not User.objects.filter(id=userID):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    # Otherwise retrieve user from database
     otherUser = User.objects.get(id=userID)
 
-    # Remove friendship
+    # Check if users are not friends, return a 204
+    if not Friend.objects.are_friends(currentUser, otherUser):
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # Otherwise remove friendship
     Friend.objects.remove_friend(currentUser, otherUser)                        
 
     # Return success response

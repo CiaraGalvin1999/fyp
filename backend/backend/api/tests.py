@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model, authenticate
 from api.models import Catalogue, CatalogueFic, Fic, Author, FicAuthor
 import json
 from rest_framework.authtoken.models import Token
+# Friendship library for friend functionality
+from friendship.models import Friend, FriendshipRequest, Follow, Block
 
 # Create your tests here.
 
@@ -629,7 +631,6 @@ class SettingTest(TestCase):
         self.response = self.client.post('/api/changePassword/', data=details, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 403)
         
-
     def test_successful_logout(self):
         self.response = self.client.get('/api/auth/logout/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 200)
@@ -656,67 +657,208 @@ class FriendTest(TestCase):
         self.user2.set_password('testPassword1!')
         self.user2.save()
 
+        # Create third user
+        self.user3 = User.objects.create_user(username='testuser3', email='test3@test.com')
+        self.user3.set_password('testPassword1!')
+        self.user3.save()
+
     # Runs after tests are completed to clean up testing database
     def tearDown(self):
         self.user.delete()
         self.token.delete()
         self.user2.delete()
+        Friend.objects.all().delete()
+        FriendshipRequest.objects.all().delete()
 
+    # Test successful get friends request - user has friends
+    # Will return a 200
     def test_successful_get_friends(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user2, self.user)
+        request = FriendshipRequest.objects.get(from_user=self.user2, to_user=self.user)
+        request.accept()
         self.response = self.client.get('/api/getFriends/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 200)
 
+    # Tests that get friends will fail if not authorised
+    # Returns a 201
     def test_not_authorised_get_friends(self):
         self.response = self.client.get('/api/getFriends/', content_type='application/json')
         self.assertEqual(self.response.status_code, 401)
 
+    # Test that get friends works even if user has no friends (i.e., will not break it)
+    # Returns a 200
+    def test_successful_get_friends_no_friends(self):
+        self.response = self.client.get('/api/getFriends/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test successful search for user that exists, and user authorised to search
+    # Returns 200
     def test_successful_search_users(self):
         self.response = self.client.get('/api/searchUsers/?username=testuser2', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 200)
 
+    # Tests that search users will return a 401 if user not authorised
     def test_not_authorised_search_users(self):
         self.response = self.client.get('/api/searchUsers/?username=testuser2', content_type='application/json')
         self.assertEqual(self.response.status_code, 401)
 
+    # Test that search users does not break if there are no results
+    # Will just send back an empty array and status code 200
+    def test_search_users_no_results(self):
+        self.response = self.client.get('/api/searchUsers/?username=unknownuser', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Tests that friend requests are successfully retrieved if user is authorised and has at least one friend request
+    # Returns a 200
     def test_successful_get_friend_requests(self):
+        # Create friend request from user 2 to user 1
+        Friend.objects.add_friend(self.user2, self.user) 
         self.response = self.client.get('/api/getFriendRequests/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 200)
 
+    # Test that user cannot retrieve friend requests if not authorised
+    # Returns a 401
     def test_not_authorised_get_friend_requests(self):
         self.response = self.client.get('/api/getFriendRequests/', content_type='application/json')
         self.assertEqual(self.response.status_code, 401)
 
+    # Tests that friend requests are successfully retrieved if user is authorised and has no pending friend requests
+    # Returns a 200
+    def test_successful_get_friend_requests(self):
+        self.response = self.client.get('/api/getFriendRequests/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Tests that accept friend request is successful if authorised and sends id of user that has sent a request to them
+    # Returns a 200
     def test_successful_accept_friend_request(self):
+        # Create friend request from user 2 to user 1
+        Friend.objects.add_friend(self.user2, self.user) 
         self.response = self.client.post('/api/acceptFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
         self.assertEqual(self.response.status_code, 200)
 
+    # Tests that accept friend request fails if user not authorised
+    # Returns 401
     def test_not_authorised_accept_friend_request(self):
+        # Create friend request from user 2 to user 1
+        Friend.objects.add_friend(self.user2, self.user) 
         self.response = self.client.post('/api/acceptFriendRequest/', {'id': self.user2.id}, content_type='application/json')
         self.assertEqual(self.response.status_code, 401)
 
-    #def test_successful_deny_friend_request(self):
+    # Test if a user sends an id of a user that does not exist when trying to accept friend request
+    def test_accept_friend_request_non_existent_user(self):
+        self.response = self.client.post('/api/acceptFriendRequest/', {'id': 164}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+    
+    # Test that if a user tries to accept a friend request that doesnt exist (user does), returns a 400
+    def test_accept_friend_request_non_existent_request(self):
+        self.response = self.client.post('/api/acceptFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
 
-    #def test_not_authorised_deny_friend_request(self):
+    # Test that deny friend request works if user is authorised and sends id of user that has sent them a friend request
+    # Returns a 200
+    def test_successful_deny_friend_request(self):
+        # Create friend request from user 2 to user 1
+        Friend.objects.add_friend(self.user2, self.user) 
+        self.response = self.client.post('/api/denyFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
 
-    #def test_successful_send_friend_request(self):
+    # Tests that deny friend request doesn't work if user is not authorised
+    # Returns a 401
+    def test_not_authorised_deny_friend_request(self):
+        # Create friend request from user 2 to user 1
+        Friend.objects.add_friend(self.user2, self.user) 
+        self.response = self.client.post('/api/denyFriendRequest/', {'id': self.user2.id}, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
 
-    #def test_not_authorised_send_friend_request(self):
+    # Test if a user sends an id of a user that does not exist when trying to deny friend request
+    def test_deny_friend_request_non_existent_user(self):
+        self.response = self.client.post('/api/denyFriendRequest/', {'id': 164}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
+    
+    # Test that if a user tries to deny a friend request that doesnt exist (user does)
+    # Returns a 400
+    def test_deny_friend_request_non_existent_request(self):
+        self.response = self.client.post('/api/denyFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 400)
 
-    #def test_successful_has_friend_requests(self):
+    # Test that a friend request is successfully sent if user is authorised and the id of an existing user (who the user is not already friends with) is sent
+    # Returns a 201
+    def test_successful_send_friend_request(self):
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': self.user3.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 201)
 
-    #def test_not_authorised_has_friend_requests(self):
+    # Friend request is not sent if user is not authorised
+    # Returns a 401
+    def test_not_authorised_send_friend_request(self):
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': self.user3.id}, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
 
-    #def test_successful_remove_friend(self):
+    # Test when a friend request is sent to a user that doesn't exist
+    def test_send_friend_request_non_existent_user(self):
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': 193}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
 
-    #def test_not_authorised_remove_friend(self):
+    # Test when a friend request is sent to a user that the current user is already friends with
+    def test_send_friend_request_non_existent_user(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user2, self.user)
+        request = FriendshipRequest.objects.get(from_user=self.user2, to_user=self.user)
+        request.accept()
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
 
+    # Test when a friend request is sent to a user when current user has already sent a friend request
+    # Return a 204
+    def test_send_friend_request_duplicate(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user, self.user2)
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
 
+    # Test when a friend request is sent to a user when other user has sent a friend request
+    def test_send_friend_request_other_user_prev_requested(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user2, self.user)
+        self.response = self.client.post('/api/sendFriendRequest/', {'id': self.user2.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
 
-    #'getFriends/'
-    #'searchUsers/'
-    #'getFriendRequests/'
-    #'acceptFriendRequest/'
-    #'denyFriendRequest/'
-    #'sendFriendRequest/'
-    #'hasFriendRequests/'
-    #'removeFriend/'
+    # Test that has friend requests works when user is authorised
+    # Returns a 200
+    def test_successful_has_friend_requests(self):
+        self.response = self.client.get('/api/hasFriendRequests/', content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that user cannot check if they have friend requests if not authorised
+    # Returns a 401
+    def test_not_authorised_has_friend_requests(self):
+        self.response = self.client.get('/api/hasFriendRequests/', content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that remove friend is successful if user is authorised and tries to remove user that they are friends with
+    def test_successful_remove_friend(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user3, self.user)
+        request = FriendshipRequest.objects.get(from_user=self.user3, to_user=self.user)
+        request.accept()
+        self.response = self.client.post('/api/removeFriend/', {'id': self.user3.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 200)
+
+    # Test that remove friend fails if user is not authorised
+    def test_not_authorised_remove_friend(self):
+        # Create friendship between two users
+        Friend.objects.add_friend(self.user3, self.user)
+        request = FriendshipRequest.objects.get(from_user=self.user3, to_user=self.user)
+        request.accept()
+        self.response = self.client.post('/api/removeFriend/', {'id': self.user3.id}, content_type='application/json')
+        self.assertEqual(self.response.status_code, 401)
+
+    # Test that remove friend sends back a 204 if they try to remove a friendship that doesn't exist
+    def test_remove_friend_not_friends(self):
+        self.response = self.client.post('/api/removeFriend/', {'id': self.user3.id}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 204)
+
+    # Test that remove friend sends back a 403 if user does not exist
+    def test_remove_friend_user_doesnt_exist(self):
+        self.response = self.client.post('/api/removeFriend/', {'id': 202}, content_type='application/json', **{'HTTP_AUTHORIZATION': f'Token {self.token}'})
+        self.assertEqual(self.response.status_code, 403)
